@@ -61,7 +61,7 @@ class DocumentoFiscal(models.Model):
     numeroDocumento = models.CharField(verbose_name=u'Número do Documento', max_length=50, blank=False, null=False, unique=False)
     dataDocumento = models.DateField(verbose_name=u'Data do Documento', null=False, blank=False)
     valorDocumento = models.DecimalField(verbose_name=u'Valor do Documento', max_digits=15, decimal_places=2, blank=False, default=0, validators=[validators.MinValueValidator(100,message='O valor do documento deve ser maior que R$ 100,00 reais!')])
-    compradoREDE = models.BooleanField(verbose_name=u'Comprou na maquininha da Rede?', default=False)
+    compradoREDE = models.BooleanField(verbose_name=u'Comprou na maquininha da PagBank?', default=False)
     compradoMASTERCARD = models.BooleanField(verbose_name=u'Comprou com Mastercard?', default=False)
     valorREDE = models.DecimalField(verbose_name=u'Valor na REDE', max_digits=7, decimal_places=2, editable=False, blank=True, default=0)   #depois posso nao mostrar
     photo = models.FileField(upload_to='docs/%Y/%m/%d', blank=True, verbose_name=u'Foto do documento fiscal')
@@ -106,13 +106,19 @@ class DocumentoFiscal(models.Model):
 
     def get_cupons(self):
         cupons = 0
-        if self.valorDocumento > 99.99:
-            valor = self.valorDocumento // 100
-            if self.compradoREDE:
-                valor = valor * 3
-            cupons = valor
-
+        if self.valorDocumento >= 50:
+            if self.compradoMASTERCARD and self.compradoREDE:
+                # Com cartão Elo na maquininha PagBank = 5 Cupons por múltiplo de R$ 50
+                cupons = (self.valorDocumento // 50) * 5
+            elif self.compradoREDE:
+                # Pagando na maquininha da PagBank ou com cartão Elo = 3 cupons por múltiplo de R$ 50
+                cupons = (self.valorDocumento // 50) * 3
+            else:
+                # Cada R$ 50,00 em compras dá direito a 1 cupom
+                cupons = self.valorDocumento // 50
         return cupons
+
+    
 
     def send_email(self):
         body = "Estamos chegando no ultimo dia de campanha do Liquida Teresina 2024. \nPedimos que você cheque os seus documentos para verificar se está tudo certo, se não falta nenhuma foto dos seus cupons fiscal para que seus documentos sejam validados com sucesso e você possa concorrer para ganhar prêmios incriveis. \n \n Atenciosamente, \n \n Organização Liquida Teresina.\n www.liquidateresina.com.br"

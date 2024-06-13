@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Lojista, RamoAtividade
+from .models import Lojista, RamoAtividade, AdesaoLojista
 import csv
 from django.http import HttpResponse
 from django import forms
@@ -12,8 +12,15 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
-class LojistaResource(resources.ModelResource):
+class AdesaoLojistaResouce(resources.ModelResource):
+    class Meta:
+        model = AdesaoLojista
+        
+class AdesaoAdmin(ImportExportModelAdmin):    
+    list_display = ['cnpj','razao_social','fantasia','email','telefone','data_contato']
+    resource_class = AdesaoLojistaResouce
 
+class LojistaResource(resources.ModelResource):
     class Meta:
         model = Lojista
 
@@ -124,3 +131,5 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 admin.site.register(Lojista, LojistaAdmin)
 admin.site.register(RamoAtividade, RamoAtividadeAdmin)
+admin.site.register(AdesaoLojista, AdesaoAdmin)
+
