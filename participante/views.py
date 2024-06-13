@@ -204,8 +204,8 @@ def homepage(request):
                         
     }
     
-    return render(request, 'participante/coming_soon.html', context)
-    #return render(request, 'participante/index.html', context)
+    # return render(request, 'participante/coming_soon.html', context)
+    return render(request, 'participante/index.html', context)
     
     # return render(request, 'participante/lojista_interessado.html', context)
         
@@ -264,8 +264,8 @@ def register(request):
 
                 new_profile.user = new_user
                 new_profile.save()
-                # subject = "Cadastro concluido com sucesso! Liquida Teresina 2023"
-                # body = "Seu cadastro na promoção Liquida Teresina 2023 foi realizado com sucesso!"
+                # subject = "Cadastro concluido com sucesso! Liquida Teresina 2024"
+                # body = "Seu cadastro na promoção Liquida Teresina 2024 foi realizado com sucesso!"
                 # email = EmailMessage(subject, body, to=[new_user.email])
                 # email.send()
                 return render(request,
@@ -367,7 +367,7 @@ def adddocfiscal(request):
                                   'participante/doc_fiscal_done.html',
                                   {'new_documentoFiscal': new_documentoFiscal})
         except Lojista.DoesNotExist:
-            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2023 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'>     <b> |Informar ao Suporte|</b></a>")
+            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'>     <b> |Informar ao Suporte|</b></a>")
             documentoFiscal_form = UserAddFiscalDocForm()
             return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
     else:
@@ -521,7 +521,7 @@ def validadocfiscal(request, id):
             if not new_doc.pendente:
                 for x in range(new_doc.qtde):
                     cupom = Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user)
-            # subject = "Você já está concorrendo! Liquida Teresina 2023"
+            # subject = "Você já está concorrendo! Liquida Teresina 2024"
             # body = "Seus cupons já foram validados e impressos agora é só aguardar o sorteio"
             # email = EmailMessage(subject, body, to=[new_doc.user.email])
             # email.send()

@@ -10,7 +10,7 @@ defusedxml==0.7.1
 diff-match-patch==20230430
 dj-database-url==2.0.0
 Django==3.2.20
-django-angular @ git+https://github.com/jrief/django-angular.git@ae9d77786f79d13cde3696ec35012feff02654fe
+django-angular==2.3.1
 django-anymail==10.0
 -e git+https://github.com/maykonmenezes/django-bcp.git@6ce7dd35cfc9c09961b363bddd1e89a35d6196ae#egg=django_bcp
 django-bootstrap4==23.2
@@ -40,6 +40,7 @@ psycopg2==2.9.6
 pycparser==2.21
 PyJWT==2.8.0
 python-dateutil==2.8.2
+python-decouple==3.8
 python-social-auth==0.2.12
 python-stdnum==1.18
 python3-openid==3.2.0

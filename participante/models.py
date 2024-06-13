@@ -115,8 +115,8 @@ class DocumentoFiscal(models.Model):
         return cupons
 
     def send_email(self):
-        body = "Estamos chegando no ultimo dia de campanha do Liquida Teresina 2023. \nPedimos que você cheque os seus documentos para verificar se está tudo certo, se não falta nenhuma foto dos seus cupons fiscal para que seus documentos sejam validados com sucesso e você possa concorrer para ganhar prêmios incriveis. \n \n Atenciosamente, \n \n Organização Liquida Teresina.\n www.liquidateresina.com.br"
-        subject = "Liquida Teresina 2023 - Estamos chegando no último dia"
+        body = "Estamos chegando no ultimo dia de campanha do Liquida Teresina 2024. \nPedimos que você cheque os seus documentos para verificar se está tudo certo, se não falta nenhuma foto dos seus cupons fiscal para que seus documentos sejam validados com sucesso e você possa concorrer para ganhar prêmios incriveis. \n \n Atenciosamente, \n \n Organização Liquida Teresina.\n www.liquidateresina.com.br"
+        subject = "Liquida Teresina 2024 - Estamos chegando no último dia"
         email = EmailMessage(subject, body, to=[self.user.email])
         email.send()
 

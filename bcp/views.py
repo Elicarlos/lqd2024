@@ -119,7 +119,7 @@ def generate(request, id_,  barcode_type='Standard39', auto_print=True):
     # Set JS to Autoprint document
     if auto_print:
         pdfdoc.PDFCatalog.OpenAction = '<</S/JavaScript/JS(this.print\({bUI:false,bSilent:true,bShrinkToFit:true}\);)>>'
-        pdfdoc.PDFInfo.title = 'Liquida Teresina 2023' # nicety :)
+        pdfdoc.PDFInfo.title = 'Liquida Teresina 2024' # nicety :)
 
     # lineUp = String(105, 212, "_______________________________________________________", textAnchor='middle', fontSize=font_size)
     # title = String(105, 196, "** LIQUIDA TERESINA 2018 **", textAnchor='middle', fontSize=12)
@@ -182,7 +182,7 @@ def generate(request, id_,  barcode_type='Standard39', auto_print=True):
         #c.drawImage(image_marko, 40, 50, mask='auto')
         c.setFont(font_name, 20)
         c.drawString(20, 660, '_______________________________________________________')
-        # c.drawString(70, 810, "** Liquida Teresina 2023 **")
+        # c.drawString(70, 810, "** Liquida Teresina 2024 **")
 
         c.setFont(font_name_bold, 23)
         c.drawString(150, 630, "Dados do Participante")
@@ -221,7 +221,7 @@ def generate(request, id_,  barcode_type='Standard39', auto_print=True):
         c.setFont(font_name, 20)
         c.drawString(100, 390, "Qual a maior campanha de premios do Piauí?")
         c.setFont(font_name_bold, 20)
-        c.drawString(100, 360, "(X) Liquida Teresina 2023")
+        c.drawString(100, 360, "(X) Liquida Teresina 2024")
         # c.drawString(340, 360, "( ) Outra")
         c.setFont(font_name, 20)
         c.drawString(40, 320, "Data:")
@@ -234,7 +234,7 @@ def generate(request, id_,  barcode_type='Standard39', auto_print=True):
         c.drawString(100, 200, '{}'.format(cupom.id))
         c.drawString(20, 7  , "_____________________________________________________")
         c.setFont(font_name_bold, 20)
-        c.drawString(150, 15, "SRE/ME N° 06.028066/2023")
+        c.drawString(150, 15, "SPA/ME N. ° 06.034371/2024")
         renderPDF.draw(d, c, 320, 80)
         c.showPage()
 

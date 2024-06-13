@@ -4,4 +4,4 @@ Disallow: /nogooglebot/
 User-agent: *
 Allow: /
 
-Sitemap: https://www.nataldepremiosteresina.com.br/sitemap.xml
+Sitemap: https://www.liquidateresina.com.br/sitemap.xml
