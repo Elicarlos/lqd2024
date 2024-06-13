@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('vendedor', models.CharField(blank=True, max_length=50, null=True, verbose_name='Nome do Vendedor')),
                 ('numeroDocumento', models.CharField(max_length=50, verbose_name='Número do Documento')),
                 ('dataDocumento', models.DateField(verbose_name='Data do Documento')),
-                ('valorDocumento', models.DecimalField(decimal_places=2, default=0, max_digits=15, validators=[django.core.validators.MinValueValidator(100, message='O valor do documento deve ser maior que R$ 100,00 reais!')], verbose_name='Valor do Documento')),
+                ('valorDocumento', models.DecimalField(decimal_places=2, default=0, max_digits=15, validators=[django.core.validators.MinValueValidator(50, message='O valor do documento deve ser maior que R$ 50,00 reais!')], verbose_name='Valor do Documento')),
                 ('compradoREDE', models.BooleanField(default=False, verbose_name='Comprou na maquininha da Rede?')),
                 ('compradoMASTERCARD', models.BooleanField(default=False, verbose_name='Comprou com Mastercard?')),
                 ('valorREDE', models.DecimalField(blank=True, decimal_places=2, default=0, editable=False, max_digits=7, verbose_name='Valor na REDE')),
