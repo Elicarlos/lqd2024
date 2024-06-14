@@ -572,7 +572,8 @@ from django.db.models import Count, F
 @user_passes_test(lambda u: u.is_superuser)
 def dados_campanha(request):
     quant_cupons = Cupom.objects.all().count()
-    quant_usuario = Profile.objects.count()
+    
+    quant_usuario = Profile.objects.filter(user__is_superuser=False).count()
     quant_lojistas = Lojista.objects.count()    
     quant_documentos = DocumentoFiscal.objects.count()
     # lojista = DocumentoFiscal.objects.select_related('lojista', 'user')
@@ -678,7 +679,7 @@ def dados_campanha(request):
     else:
         ticket_medio = float(faturamento_total / quant_documentos) 
 
-  
+    print(quant_usuario)
 
     context = {
         'labels': labels,
