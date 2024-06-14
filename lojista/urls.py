@@ -23,6 +23,8 @@ urlpatterns = [
     # Ramo de atividades pathpatterns
     path('registeratividade/', views.registeratividade, name='registeratividade'),
     path('listatividade/', views.listatividade, name='listatividade'),
+    path('lojistas-interessados/', views.lista_interessado, name='lista_interessado'),
+    path('marcar_como_atendido/<int:adesao_id>/', views.marcar_como_atendido, name='marcar_como_atendido'),
 
     path('search/doc', views.reprint, name='search_by_doc'),
 ]

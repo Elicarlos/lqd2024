@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -6,7 +7,7 @@ from django.contrib import messages
 
 from participante.forms import ProfileEditForm, UserEditForm
 from .forms import LojistaRegistrationForm, RamoAtividadeRegistrationForm
-from .models import Lojista, RamoAtividade
+from .models import Lojista, RamoAtividade, AdesaoLojista
 from django.contrib.auth.decorators import user_passes_test
 from .filters import LojistaFilter
 from django.db.models.functions import Lower, Upper
@@ -197,3 +198,22 @@ def listatividade(request):
     ramosatividade = RamoAtividade.objects.all()
     return render(request, 'lojista/list_ramo_atividade.html', {'section': 'ramoatividade',
                                                       'ramosatividade': ramosatividade})
+    
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def lista_interessado(request):
+    interessados = AdesaoLojista.objects.all()
+    
+    return render(request, 'lojista/lista_interessados.html', {'section': 'interessados',
+                                                      'interessados': interessados})
+    
+@login_required
+@user_passes_test(lambda u: u.is_superuser)    
+def marcar_como_atendido(request, adesao_id):
+    adesao = get_object_or_404(AdesaoLojista, id=adesao_id)
+    adesao.atendido =  True
+    adesao.atendido_por = request.user
+    adesao.data_contato = timezone.now()
+    adesao.save()
+    return redirect('lojista:lista_interessado')

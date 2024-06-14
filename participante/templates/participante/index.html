@@ -100,33 +100,49 @@
 	  }
 	}
 	.background-orange {
-		background-color: orange;
-		padding-top: 8rem;
-    	padding-bottom: 8rem;
-	  }
-	  .img-premios-mobile2 {
-		max-width: 100%; /* Garante que a imagem não exceda a largura da div */
-		height: auto; /* Mantém a proporção da imagem */
-	  }
-	
-	  @media (max-width: 768px) {
-		.img-premios-mobile2 {
-		  /* Ajuste o estilo da imagem para telas menores */
-		}
-	  }
+    background: none; /* Remove o fundo para usar a imagem diretamente */
+    height: 100vh; /* Altura de 100% da viewport */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-	  .background-banner-liso {
-		background: linear-gradient(45deg, #ff8c00, #ffdd24);
+.img-premios-mobile2 {
+    width: 100%;
+    height: auto; /* Mantém a proporção da imagem */
+}
+
+@media (max-width: 768px) {
+    .img-premios-mobile2 {
+        content: url("{% static 'img/2023/premios-mobile.png' %}");
+        width: 100%;
+        height: auto;
+    }
+}
+
+
+	  /* .background-banner-liso {
+		background: linear-gradient(45deg, #FFC700, #FFC700);
 		height: 100vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	  }
-	  .bg-dark {
+	  } */
+	  .background-banner-liso {
+            background: 
+                        url("{% static 'img/2023/fundo-amarelo.png' %}") no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+	  /* .bg-dark {
 		padding: 40px 0;
 		color: white; 
 	  }
-  
+   */
 </style>
 
 {% endblock %}
@@ -222,7 +238,7 @@
 				</div>
 	
 				<div data-animation="animated bounceInUp" class="logo-banner-prin">
-					<img src="{% static 'img/2023/banner.png'%}" class="img-responsive" alt="logo-banner" style="width: 30rem; margin: 0 auto 0 auto; margin-top: -8px;">
+					<img src="{% static 'img/2023/banner.png'%}" class="img-responsive" alt="logo-banner" style="width: 40rem; margin: 0 auto 0 auto; margin-top: -8px;">
 				</div>
 	
 				<a href="{% url 'participante:register' %}" class="btn btn-primary btn-lg page-scroll blink_me" data-animation="animated fadeInRight">Cadastre-se aqui</a>
@@ -254,7 +270,7 @@
 	</div>
 </div > {% endcomment %}
 <div class="background-div" >
-	<img src="{% static 'img/2023/maq.png'%}" alt="Maquininha da rede" class="img-responsive"  alt="logo-banner" id="maquineta" style="">
+	<img src="{% static 'img/2023/maq.png'%}" alt="Maquininha da rede" class="img-responsive"  alt="logo-banner" id="maquineta" style="margin-top: 20rem; margin-bottom: 20rem;">
 </div>
 
 
@@ -264,7 +280,7 @@
 <div class="row">
 	<div class="col-lg-12 text-center">
 		<h2 class="section-heading"><b>Como participar</b></h2>
-		<br><br><br>
+		<br>
 		<!-- <video autobuffer controls autoplay style="max-width: 100%; ">
 	  		<source id="mp4" src="https://liquida2023.s3.us-east-2.amazonaws.com/videos/liquida2023.mp4">
 		</video> -->
@@ -288,9 +304,9 @@
 					</div>
 					
 					<p>
-						Separe as notas fiscais e os comprovantes dos cartões das compras
-						 realizadas nas lojas participantes durante o Liquida Teresina, 
-						 no período de 28/06/2024 a 07/07/2024.
+						Separe as notas fiscais e comprovantes dos cartões das compras 
+						realizadas nas lojas participantes do Liquida Teresina 2024, 
+						durante os dias 28 de junho de 2024 a 07 de julho de 2024.
 					</p>
 					<!-- <a data-toggle="modal" href="#exampleModalLong">
   Lojas Parceiras
@@ -348,12 +364,11 @@
 					<div class="meta">
 						 Passo 3
 					</div>
-					<h3><a href="{% url "participante:register" %}"></a>Faça agora o seu cadastro</a></h3>
+					<h3><a href="{% url "participante:register" %}"></a>Faça seu cadastro</a></h3>
 					<p>
-						Os itens marcados com asteriscos são de preenchimento obrigatório 
-						para a validação do cupom. Os dados informados serão utilizados 
-						para entrar em contato com os contemplados, portanto, preste 
-						muita atenção ao cadastrar seus telefones, endereço e e-mail.
+						Os campos com asteriscos são de preenchimento obrigatório para a validação do cupom. 
+						Os dados informados serão utilizados para entrar em contato com os contemplados, 
+						portanto, preencha com muita atenção seus telefones, endereços e e-mail.
 
 					</p>
 				</div>
@@ -372,9 +387,10 @@
 					
 					<p>
 						
-					Após seu cadastro, registre suas notas e comprovantes. 
-					A cada R$ 100,00 em compras, ganhe 1 cupom. 
-					Pagando com a maquininha da Rede, obtenha 3 cupons. 		
+						Após realizar seu cadastro, é hora de cadastrar suas notas fiscais e comprovantes dos cartões. Lembrando que cada R$50,00 em compras dá direito a 1 cupom. Além disso:
+						- Pagando na maquininha da PagBank ou com o cartão ELO = 3 cupons
+						- Com cartão ELO na maquininha PagBank = 5 cupons
+								
 
 
 					</p>
@@ -393,9 +409,10 @@
 					</div>
 					
 					<p>
-						Agora, basta fotografar ou escanear a nota fiscal e o comprovante
-						do cartão (caso a compra tenha sido realizada nas máquinas da REDE) 
-						e anexar a imagem no ícone.						
+						Após realizar seu cadastro, é hora de cadastrar suas notas fiscais e comprovantes dos cartões. Lembrando que cada R$50,00 em compras dá direito a 1 cupom. Além disso:
+- Pagando na maquininha da PagBank ou com o cartão ELO = 3 cupons
+- Com cartão ELO na maquininha PagBank = 5 cupons
+						
 					</p>
 				</div>
 			</div>
@@ -412,11 +429,11 @@
 					</div>
 					<h3> Pronto! Repita quantas vezes quiser </h3>
 					<p>
-						Quanto mais notas cadastradas, mais chances de ser sorteado. As notas
-						fiscais cadastradas, serão analizadas por um backoffice da campanha
-						e o status de validação e a quantidade de cupons e a quantidade de
-						cupons gerados ficará disponível no proprio site para consulta.
-						Caso haja alguma dúvida ou erro no envio, nossa equipe entrará em contato.
+						Quanto mais notas cadastradas, mais chances você terá de ser sorteado. 
+						As notas fiscais cadastradas serão analisadas por um backoffice da campanha e o 
+						status de validação e a quantidade de cupons gerados ficarão disponíveis no seu perfil 
+						de usuário na plataforma para consulta. Caso haja alguma dúvida ou erro no envio, nossa 
+						equipe entrará em contato via e-mail informado ou pelo campo de observação da plataforma.
 					</p>
 				</div>
 			</div>
@@ -450,13 +467,14 @@
 </div>
 
 
-<div class="background-orange">
-	<div class="row no-gutter">
-		<div class="col-12 text-center">
-		  <img class="img-premios-mobile2" src="{% static 'img/2023/premios.png' %}" id="portfolio" class="img-responsive" style="display: inline-block;">
-		</div>
-	  </div>
+<div class="">
+    <div class="row no-gutter">
+        <!-- <div class="col-12 text-center">  -->
+            <img class="img-premios-mobile2 img-fluid w-100" src="{% static 'img/2023/premios.png' %}" id="portfolio">
+        <!-- </div> -->
+    </div>
 </div>
+
 
   
   

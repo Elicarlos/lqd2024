@@ -1,0 +1,56 @@
+{% extends 'mobile.html' %}
+{% load bootstrap4 %}
+{% load widget_tweaks %}
+{% block title %}Lojistas{% endblock %}
+{% block content %}
+  <form method="get">
+    <div class="well" style="margin-top: 70px;">
+      <h4 style="margin-top: 0">Filtro</h4>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+          {{ filter.form.CNPJLojista.label_tag }}
+          {% render_field filter.form.CNPJLojista class="form-control cnpj" %}
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <span class="glyphicon glyphicon-search"></span> Buscar
+        </button>
+      </div>
+    </div>
+  </form>
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>CNPJ</th>
+        <th>Razão Social</th>
+        <th>Fantasia</th>
+        <th>Email</th>
+        <th>Telefone</th>
+        <th>Atendido</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for interessado in interessados %}
+        <tr>
+          <td>{{ interessado.cnpj }}</td>
+          <td>{{ interessado.razao_social }}</td>
+          <td>{{ interessado.fantasia }}</td>
+          <td>{{ interessado.email }}</td>
+          <td>{{ interessado.telefone }}</td>
+          <td>
+            {% if interessado.atendido %}
+              Sim
+            {% else %}
+              <a href="{% url 'lojista:marcar_como_atendido' interessado.id %}" class="btn btn-success btn-sm"><i class="fas fa-check"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">Nenhum dado encontrado</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

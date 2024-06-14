@@ -69,6 +69,8 @@ class AdesaoLojista(models.Model):
     email = models.EmailField(verbose_name='Email', max_length=250, null=True, blank=False)
     telefone = models.CharField(verbose_name='Telefone', max_length=20, blank=False, null=True, help_text='(xx) xxxxx - xxxx')
     data_contato = models.DateTimeField(verbose_name='Data do contato', null=True, blank=True, help_text='Data e hora em que o vendedor entrou em contato ')
+    atendido_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, help_text="Atendido por")
+    atendido = models.BooleanField(default=False)
     
     def __str__(self):
         return self.fantasia or self.razao_social
