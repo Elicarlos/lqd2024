@@ -61,7 +61,7 @@ class DocumentoFiscal(models.Model):
     numeroDocumento = models.CharField(verbose_name=u'Número do Documento', max_length=50, blank=False, null=False, unique=False)
     dataDocumento = models.DateField(verbose_name=u'Data do Documento', null=False, blank=False)
     valorDocumento = models.DecimalField(verbose_name=u'Valor do Documento', max_digits=15, decimal_places=2, blank=False, default=0, validators=[validators.MinValueValidator(50,message='O valor do documento deve ser maior que R$ 50,00 reais!')])
-    compradoREDE = models.BooleanField(verbose_name=u'Comprou na maquininha da PagBank?', default=False)
+    compradoREDE = models.BooleanField(verbose_name=u'Comprou na maquininha da PagBank ou pagou com Elo?', default=False)
     compradoMASTERCARD = models.BooleanField(verbose_name=u'Comprou com Elo?', default=False)
     valorREDE = models.DecimalField(verbose_name=u'Valor na REDE', max_digits=7, decimal_places=2, editable=False, blank=True, default=0)   #depois posso nao mostrar
     photo = models.FileField(upload_to='docs/%Y/%m/%d', blank=True, verbose_name=u'Foto do documento fiscal')
