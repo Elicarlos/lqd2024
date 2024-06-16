@@ -100,8 +100,7 @@
 	  }
 	}
 	.background-orange {
-    background: none; /* Remove o fundo para usar a imagem diretamente */
-    height: 100vh; /* Altura de 100% da viewport */
+    background: none; /* Remove o fundo para usar a imagem diretamente */   
     display: flex;
     align-items: center;
     justify-content: center;
@@ -132,7 +131,7 @@
             background: 
                         url("{% static 'img/2023/fundo-amarelo.png' %}") no-repeat center center;
             background-size: cover;
-            height: 100vh;
+            /* height: 100vh; */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -143,6 +142,10 @@
 		color: white; 
 	  }
    */
+
+   .justificado {
+	text-align: justify;
+   }
 </style>
 
 {% endblock %}
@@ -173,6 +176,9 @@
 			<li>
 			<a class="page-scroll" href="#portfolio">Prêmios</a>
 			</li>
+			<li>
+				<a class="page-scroll" href="#adesao_lojista">Cadastre sua Loja</a>
+				</li>
 			<li>
 			<a class="page-scroll" href="https://drive.google.com/file/d/1SO2JvHxtS0rPsw5AGAg7n6p2SaToqRJ9/view?usp=drive_link">Regulamento</a>
 			</li>
@@ -210,6 +216,32 @@
 <!-- /.container -->
 </nav>
 
+
+<!-- Modal HTML -->
+<div class="modal" tabindex="-1" role="dialog" id="modalPosto" aria-labelledby="modalPostoLabel" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'definir_posto' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPostoLabel">Selecione seu posto de trabalho</h5>
+                </div>
+                <div class="modal-body">
+                    <select name="posto_id" class="form-control">
+                        {% for posto in postos %}
+                            <option value="{{ posto.id }}">{{ posto.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <!-- Modal Login -->
 <div class="container">
 	<!-- Login -->
@@ -241,7 +273,8 @@
 					<img src="{% static 'img/2023/banner.png'%}" class="img-responsive" alt="logo-banner" style="width: 40rem; margin: 0 auto 0 auto; margin-top: -8px;">
 				</div>
 	
-				<a href="{% url 'participante:register' %}" class="btn btn-primary btn-lg page-scroll blink_me" data-animation="animated fadeInRight">Cadastre-se aqui</a>
+				<!-- <a href="{% url 'participante:register' %}" class="btn btn-primary btn-lg page-scroll blink_me" data-animation="animated fadeInRight">Cadastre-se aqui</a> -->
+				<a href="#adesao_lojista" class="btn btn-primary btn-lg page-scroll blink_me" data-animation="animated fadeInRight">Cadastre sua Loja</a>
 				<h3 style="font-weight: bold;">
 					28/06/2024 A 07/07/2024
 				</h3>
@@ -257,18 +290,7 @@
 <!--Maquineta da rede -->
 
   
-{% comment %} <div class="container">
-	
-	<div class="row">		
-		<div class="col-md-12">			
-			<div class="maquineta text-center">
-				
-				<!-- <img src="{% static 'img/2023/maq.png'%}" alt="Maquininha da rede" class="img-responsive" style=" width: 600px; margin: 100px auto 100px auto;" alt="logo-banner"> -->
-				
-			</div>
-		</div>
-	</div>
-</div > {% endcomment %}
+
 <div class="background-div" >
 	<img src="{% static 'img/2023/maq.png'%}" alt="Maquininha da rede" class="img-responsive"  alt="logo-banner" id="maquineta" style="margin-top: 20rem; margin-bottom: 20rem;">
 </div>
@@ -279,7 +301,7 @@
 <div class="container">
 <div class="row">
 	<div class="col-lg-12 text-center">
-		<h2 class="section-heading"><b>Como participar</b></h2>
+		<h2 class="section-heading" class="h1"><b>COMO PARTICIPAR</b></h2>
 		<br>
 		<!-- <video autobuffer controls autoplay style="max-width: 100%; ">
 	  		<source id="mp4" src="https://liquida2023.s3.us-east-2.amazonaws.com/videos/liquida2023.mp4">
@@ -364,7 +386,7 @@
 					<div class="meta">
 						 Passo 3
 					</div>
-					<h3><a href="{% url "participante:register" %}"></a>Faça seu cadastro</a></h3>
+					<h3><a href="{% url 'participante:register' %}"></a>Faça seu cadastro</a></h3>
 					<p>
 						Os campos com asteriscos são de preenchimento obrigatório para a validação do cupom. 
 						Os dados informados serão utilizados para entrar em contato com os contemplados, 
@@ -462,6 +484,7 @@
 		<h2 class="section-heading" id="premio"><b>PRÊMIOS</b>
 		<hr class="primary">
 	</div>
+	<br><br><br>
 </div>
 </div>
 
@@ -471,16 +494,100 @@
         <!-- <div class="col-12 text-center">  -->
             <img class="img-premios-mobile2 img-fluid w-100" src="{% static 'img/2023/premios.png' %}" id="portfolio">
         <!-- </div> -->
-    </div>
+   
 </div>
-
-
-  
-  
 
 </section>
 
 
+
+
+
+
+<!-- Section Contact
+================================================== -->
+<section id="adesao_lojista" style="margin-top: 10rem; margin-bottom: 10rem;">
+	<h2 class="section-heading text-center text-black"><b>CADASTRE-SE</b></h2>
+		<hr class="primary">
+		<BR></BR><br>
+<div class="container">
+<div class="row">
+	<div class="col-md-6">
+		
+		<!-- <h2 class="h2 mt-3">Amplie Seu Alcance Comercial com Liquida Teresina!</h2>
+		<BR>
+		<p class="justificado">Permita que seus clientes
+			participem de uma das maiores campanhas de varejo do Piauí.
+			 Ao comprar um kit de participação, suas vendas ganham um impulso significativo,
+			  já que os clientes serão incentivados a comprar em sua loja para participarem
+			   dos sorteios de prêmios incríveis.
+		</p>
+		<BR></BR> -->
+
+		<h2 class="text-center">VANTAGENS:</h2>
+		</BR>
+		<ul class="justificado">
+			<li>
+				<b>Aumento nas Vendas:</b> A campanha motiva os consumidores a escolherem sua loja para realizar suas compras, proporcionando um incremento no fluxo de clientes.
+			</li>
+			<li>
+			<b>Maior Alcance:</b> Participar da campanha posiciona sua loja como uma das preferidas pelos consumidores, que buscam as lojas participantes para concorrer aos prêmios, ampliando assim o reconhecimento do seu negócio.
+			Não perca essa chance única! Cadastre-se hoje e veja seu negócio prosperar!   
+			</li>
+		</ul><br>
+		<br>	   
+   	</div>
+
+	
+	<div class="col-md-6 ">
+		
+		
+
+		<div class="regularform">
+			<div class="done">
+				<!-- {% if messages %}
+				<div class="messages">
+					{% for message in messages %}
+					<div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'info' %}alert-info{% endif %}">
+						<button type="button" class="close" data-dismiss="alert">×</button>
+						{{ message }}
+					</div>
+					{% endfor %}
+				</div>
+				{% endif %} -->
+				{% if form_adesao.errors %}
+<div class="error-summary">
+    <ul>
+    {% for field in form_adesao %}
+        {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+			</div>
+			
+			<form method="post" id="formAdesao" class="text-left">
+				{% csrf_token %}
+                <input type="hidden" name="form_type" value="form_adesao">
+
+				<input name="cnpj" type="text" class="col-md-6" placeholder="Seu CNPJ *" id="cnpj">
+				<input name="razao_social" type="text" class="col-md-12" placeholder="Razão Social *" id="razao_social">
+				<input name="fantasia" type="text" class="col-md-12" placeholder="Fantasia *" id="fantasia">
+				<input name="email" type="email" class="col-md-6" placeholder="Email *" id="email">
+				<input name="telefone" type="tel" class="col-md-6" placeholder="Telefone *" id="telefone">			
+				<!-- <button type="submit" name="submit" id="submit" class="contact submit btn btn-primary btn-xl">Cadastrar</button> -->
+				<div class="form-group text-right">
+					<button class="btn btn-primary">Faça sua Adesão</button>
+				</div> 
+			</form>
+			<div id="adesao-message"></div>
+		</div>
+	</div>
+</div>
+</div>
+</section>
 
 <!-- Section Social
 ================================================== -->
@@ -534,38 +641,6 @@
 <div class="clearfix">
 </div>
 
-<!-- Section Contact
-==================================================
-<section id="contact">
-<div class="container">
-<div class="row">
-	<div class="col-md-8 col-md-offset-2 text-center">
-		<h2 class="section-heading">CADASTRE-SE</b></h2>
-		<hr class="primary">
-
-		<div class="regularform">
-			<div class="done">
-				<div class="alert alert-success">
-					<button type="button" class="close" data-dismiss="alert">×</button>
-					Your message has been sent. Thank you!
-				</div>
-			</div>
-			<form method="post" action="contact.php" id="contactform" class="text-left">
-				<input name="name" type="text" class="col-md-6 norightborder" placeholder="Seu nome *">
-				<input name="email" type="email" class="col-md-6" placeholder="Seu email *">
-				<input name="rg" type="text" class="col-md-6 norightborder" placeholder="RG *">
-				<input name="cpf" type="text" class="col-md-6" placeholder="CPF *">
-				<input name="adress" type="text" class="col-md-12" placeholder="Endereço *">
-				<h3>Qual é a maior promoção de comércio de Teresina?</h3>
-				<input name="answer" type="text" class="col-md-12" placeholder="Sua resposta *">
-				<input type="submit" id="submit" class="contact submit btn btn-primary btn-xl" value="Cadastrar">
-			</form>
-		</div>
-	</div>
-</div>
-</div>
-</section>-->
-
 <!-- Section Footer
 ================================================== -->
 <div class="img-patrocinio" style="width: 100%; text-align: center;">
@@ -584,14 +659,14 @@
 </div>
 </section>
 
-<script>
+<!-- <script>
 	var video = document.getElementById("mp4");
   
 	// Evento para iniciar a reprodução do vídeo quando a página for carregada
 	video.addEventListener("loadedmetadata", function() {
 	  video.play();
 	});
-</script>
+</script> -->
 
 {% comment %} <script>
 	console.log("estou aqui no index.html")
@@ -616,5 +691,31 @@
 <script src="{% static 'js/jquery.mask.js' %}"></script>
 <script src="{% static 'js/masks.js' %}"></script>
 <noscript>Seu navegador não suporta JavaScript!</noscript>
+<script>
+	$(document).ready(function() {
+		$('#loginForm').on('submit', function(event) {
+			event.preventDefault();
+			$.ajax({
+				url: "{% url 'participante:homepage' %}",
+				type: "POST",
+				data: $(this).serialize(),
+				success: function(response) {
+					if (response.login_error) {
+						$('#password-errors').html(response.errors.password);
+						$('#myModal').modal('show');
+					} else {
+						window.location.href = response.redirect_url;
+					}
+				},
+				error: function(xhr, errmsg, err) {
+					console.log(xhr.status + ": " + xhr.responseText);
+				}
+			});
+		});
+
+		
+		
+	});
+</script>
 </body>
 </html>

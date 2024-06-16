@@ -205,59 +205,7 @@
 <!-- Section Intro Slider
 ================================================== -->
 <div id="carousel-example-generic" class="carousel intro slide container">
-	<div class="row g-6" style="margin-top: 20rem; height: 100vh;">
-		<div class="col-md-6">
-			<h2 class="h2">Amplie Seu Alcance Comercial com Liquida Teresina!</h2>
-			<p>Participe do Liquida Teresina e conecte-se a uma ampla 
-				rede de consumidores, aumentando suas vendas e visibilidade. 
-				Aproveite esta oportunidade única para destacar 
-				seu negócio em uma das maiores campanhas de varejo do Piauí, 
-				com suporte contínuo e acesso a um público diversificado. 
-				Cadastre-se hoje e veja seu negócio prosperar!</p>
-		</div>	
-		<div class="col-md-6">
-			{% if messages %}
-			<div class="messages">
-				{% for message in messages %}
-				<div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'info' %}alert-info{% endif %}" role="alert">
-					{{ message }}
-				</div>
-				
-				{% endfor %}
-			</div>
-			{% endif %}
-
-			<div class="card">
-				<div class="card-title" style="margin-bottom: 2rem;">
-					<h2 class="h2"></h2>
-				</div>
-				<div class="card-body">
-					<form action="" method="post">
-						{% csrf_token %}
-						<input type="hidden" name="form_type" value="form_adesao">
-						<div class="form-group">						
-							<input class="form-control" placeholder="CNPJ" type="text" name="cnpj" id="">
-						</div>
-						<div class="form-group">
-							<input class="form-control" placeholder="Razão Social" type="text" name="razao_social" id="">
-						</div>
-						<div class="form-group">
-							<input class="form-control" placeholder="Fantasia" type="text" name="fantasia" id="">
-						</div>
-						<div class="form-group">
-							<input class="form-control" placeholder="Email" type="email" name="email" id="">
-						</div>
-						<div class="form-group">
-							<input class="form-control" placeholder="Telefone" type="tel" name="telefone" id="">
-						</div>	
-						<div class="form-group text-right">
-							<button class="btn btn-primary">Faça sua Adesão</button>
-						</div>					
-					</form>			
-				</div>
-			</div>
-		</div>
-	</div>
+	
 	
 </div>
 <!-- /.carousel -->
@@ -623,5 +571,51 @@
 <script src="{% static 'js/jquery.mask.js' %}"></script>
 <script src="{% static 'js/masks.js' %}"></script>
 <noscript>Seu navegador não suporta JavaScript!</noscript>
+<script>
+	$(document).ready(function() {
+		$('#loginForm').on('submit', function(event) {
+			event.preventDefault();
+			$.ajax({
+				url: "{% url 'participante:homepage' %}",
+				type: "POST",
+				data: $(this).serialize(),
+				success: function(response) {
+					if (response.login_error) {
+						$('#password-errors').html(response.errors.password);
+						$('#myModal').modal('show');
+					} else {
+						window.location.href = response.redirect_url;
+					}
+				},
+				error: function(xhr, errmsg, err) {
+					console.log(xhr.status + ": " + xhr.responseText);
+				}
+			});
+		});
+
+		$('#formAdesao').on('submit', function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: "{% url 'participante:homepage' %}",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function(response) {
+                if (response.message) {
+                    $('#adesao-message').html('<div class="alert alert-success">' + response.message + '</div>');
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+    });
+});
+	
+
+	
+</script>
+
 </body>
 </html>

@@ -10,9 +10,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.urls import reverse
 from yaml import DocumentEndEvent
 from .forms import *
-from .models import Profile, DocumentoFiscal
+from .models import Profile, DocumentoFiscal, PostoTrabalho
 from lojista.models import Lojista, AdesaoLojista
 from .filters import UserFilter, DocFilter
 from django.db.models.functions import Lower, Upper
@@ -26,6 +27,7 @@ from .forms import LoginForm, CepForm
 from lojista.forms import FormLojistaAdesao
 import requests
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
 
 
 
@@ -151,30 +153,46 @@ def register2(request):
 #     # Cadastro de Lojista Interessados
 #     return render(request, 'participante/lojista_interessado.html', {'section': 'homepage', 'lf': login_form})
 
+@login_required
+def set_posto_trabalho(request):
+    if request.method == "POST":
+        posto_id = request.POST.get('posto_trabalho')
+        posto = get_object_or_404(PostoTrabalho, id=posto_id)
+        request.session['posto_trabalho'] = posto.id
+        return HttpResponse('Salvo com sucesso')
+    return HttpResponse('home')
 
 def homepage(request):
-       
-    if request.method == 'POST':
+    if request.method == 'POST':        
         login_form = LoginForm(request.POST)
         form_adesao = FormLojistaAdesao(request.POST)
-        form_type = request.POST.get('form_type')      
-
-        if form_type == 'form_login':           
+        form_type = request.POST.get('form_type')     
+        
+        if form_type == 'form_login':
+            login_form = LoginForm(request.POST)
             if login_form.is_valid():
-                cd = login_form.cleaned_data                
+                cd = login_form.cleaned_data
                 user = authenticate(username=cd['username'], password=cd['password'])
                 if user is not None and user.is_active:
                     login(request, user)
-                    return redirect('lojista:homepage' if user.is_superuser else 'participante:dashboard')
-                else:
-                    context = {
-                        'section': homepage,
-                        'lf': login_form,
-                        'form_adesao': form_adesao,
-                        
-                    }
-                    return render(request, 'participante/index.html', context)
-                
+                    return JsonResponse({'redirect_url': redirect('lojista:homepage' if user.is_superuser else 'participante:dashboard').url})
+                else:                 
+                    return JsonResponse({'login_error': True, 'errors': {'__all__': ['Credenciais inválidas']}})
+            else:
+                # Erros de validação do formulário
+                errors = login_form.errors.get_json_data()
+                return JsonResponse({'login_error': True, 'errors': errors})    
+            
+        # elif form_type == 'form_adesao':
+        #     print('forms_adesao')
+        #     form_adesao = FormLojistaAdesao(request.POST)
+        #     cnpj = request.POST.get('cnpj')
+        #     if AdesaoLojista.objects.filter(cnpj=cnpj).exists():
+        #         return JsonResponse({'message': 'CNPJ já cadastrado'})
+        #     elif form_adesao.is_valid():
+        #         form_adesao.save()
+        #         print('aqui')
+        #         return JsonResponse({'message': 'Cadastro realizado com sucesso!'})
         elif form_type == 'form_adesao':
             cnpj = request.POST.get('cnpj')
             if AdesaoLojista.objects.filter(cnpj=cnpj).exists():
@@ -182,31 +200,23 @@ def homepage(request):
                 return HttpResponseRedirect(request.path_info)
                      
             elif form_adesao.is_valid():
+                print('form-valido')
                 form_adesao.save()
                 messages.success(request, 'Cadastro realizado com sucesso!')
+                # return HttpResponseRedirect(request.path_info)
                 return HttpResponseRedirect(request.path_info)
             else:
-                context = {
-                        'section': homepage,
-                        'lf': login_form,
-                        'form_adesao': form_adesao,                        
-                }
-                return render(request, 'participante/lojista_interessado.html', context)
-
-    else:     
+                messages.error(request,'Erro nos dados de formulario adesao')
+    else: 
         login_form = LoginForm()
         form_adesao = FormLojistaAdesao()
-
     context = {
-                        'section': homepage,
-                        'lf': login_form,
-                        'form_adesao': form_adesao,
-                        
-    }
-    
-    return render(request, 'participante/coming_soon.html', context)
-    # return render(request, 'participante/index.html', context)
-    
+            'section': homepage,
+            'lf': login_form,
+            'form_adesao': form_adesao,
+        }
+    # return render(request, 'participante/coming_soon.html', context)    
+    return render(request, 'participante/index.html', context)    
     # return render(request, 'participante/lojista_interessado.html', context)
         
                 
