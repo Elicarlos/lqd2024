@@ -25,6 +25,7 @@
         <th>CNPJ do Lojista</th>
         <th>Inscrição Estadual</th>
         <th>Ramo de Atividade</th>
+        <th>localizacao</th>
       </tr>
     </thead>
     <tbody>
@@ -34,6 +35,7 @@
           <td>{{ lojista.CNPJLojista }}</td>
           <td>{{ lojista.IELojista }}</td>
           <td>{{ lojista.ramoAtividade }}</td>
+          <td>{{ lojista.localizacao.nome }}</td>
         </tr>
       {% empty %}
         <tr>

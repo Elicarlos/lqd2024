@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Lojista, RamoAtividade, AdesaoLojista
+from .models import Lojista, RamoAtividade, AdesaoLojista, Localizacao
 import csv
 from django.http import HttpResponse
 from django import forms
@@ -19,7 +19,15 @@ class AdesaoLojistaResouce(resources.ModelResource):
 class AdesaoAdmin(ImportExportModelAdmin):    
     list_display = ['cnpj','razao_social','fantasia','email','telefone','data_contato']
     resource_class = AdesaoLojistaResouce
-
+    
+class LocalizacaoResource(resources.ModelResource):
+    class Meta:
+        model = Localizacao
+        
+class LocalizacaoAdmin(ImportExportModelAdmin):
+    list_display = ['nome', 'descricao']
+    resource_class = LocalizacaoResource
+    
 class LojistaResource(resources.ModelResource):
     class Meta:
         model = Lojista
@@ -33,6 +41,7 @@ class LojistaAdmin(ImportExportModelAdmin):
     list_display = ['id','CNPJLojista', 'IELojista', 'razaoLojista', 'fantasiaLojista',
                          'ramoAtividade', 'dataCadastro', 'CadastradoPor', 'ativo' ]
     search_fields = ('fantasiaLojista', 'ramoAtividade__atividade', 'CNPJLojista')
+    readonly_fields = ('CadastradoPor',)
     resource_class = LojistaResource
 
 class ExportCsvMixin:
@@ -132,4 +141,5 @@ class LogEntryAdmin(admin.ModelAdmin):
 admin.site.register(Lojista, LojistaAdmin)
 admin.site.register(RamoAtividade, RamoAtividadeAdmin)
 admin.site.register(AdesaoLojista, AdesaoAdmin)
+admin.site.register(Localizacao, LocalizacaoAdmin)
 

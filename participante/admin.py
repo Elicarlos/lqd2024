@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import Profile, DocumentoFiscal
+from .models import Profile, DocumentoFiscal, PostoTrabalho
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin
@@ -11,9 +11,16 @@ from django.urls import reverse
 from import_export.admin import ImportExportActionModelAdmin
 
 class UserResource(resources.ModelResource):
-
     class Meta:
         model = User
+        
+class PostoTrabalhoResource(resources.ModelResource):
+    class Meta:
+        model = PostoTrabalho
+        
+class PostoTrabalhoAdmin(ImportExportModelAdmin):
+    list_display = ['nome', 'descricao']
+    resource_class = PostoTrabalhoResource
 
 class MyUserAdmin(ImportExportActionModelAdmin, ImportExportModelAdmin, UserAdmin):
 	resource_class = UserResource
@@ -88,3 +95,4 @@ admin.site.register(User, MyUserAdmin)
 
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(DocumentoFiscal, DocumentoFiscalAdmin)
+admin.site.register(PostoTrabalho, PostoTrabalhoAdmin)

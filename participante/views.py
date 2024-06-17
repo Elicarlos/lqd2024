@@ -154,7 +154,7 @@ def register2(request):
 #     return render(request, 'participante/lojista_interessado.html', {'section': 'homepage', 'lf': login_form})
 
 @login_required
-def set_posto_trabalho(request):
+def definir_posto(request):
     if request.method == "POST":
         posto_id = request.POST.get('posto_trabalho')
         posto = get_object_or_404(PostoTrabalho, id=posto_id)
@@ -215,8 +215,8 @@ def homepage(request):
             'lf': login_form,
             'form_adesao': form_adesao,
         }
-    # return render(request, 'participante/coming_soon.html', context)    
-    return render(request, 'participante/index.html', context)    
+    return render(request, 'participante/coming_soon.html', context)    
+    # return render(request, 'participante/index.html', context)    
     # return render(request, 'participante/lojista_interessado.html', context)
         
                 

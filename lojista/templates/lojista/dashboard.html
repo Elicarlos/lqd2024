@@ -56,7 +56,7 @@
       {% if is_backoffice or is_gerente %}
         <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "lojista:registeratividade" %}">
         Adicionar Ramo de atividade <span class="glyphicon glyphicon-plus"></span>
-        </a>
+        </a>        
       {% endif %}
 
       {% if is_backoffice or is_gerente %}
@@ -64,6 +64,20 @@
         Ver Ramos de atividade <span class="glyphicon glyphicon-tag">
       </a>
       {% endif %}
+
+      {% if is_gerente %}
+      <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "lojista:register_localizacao" %}">
+        Adicionar Localização <span class="glyphicon glyphicon-plus"></span>
+        </a>      
+      {% endif %}
+
+      {% if is_gerente %}
+      <a type="button" id="mymodal" class="btn btn-secondary btn-lg" data-toggle="modal" href="{% url "lojista:lista_localizao" %}">
+        Ver Localização <span class="glyphicon glyphicon-tag">
+      </a>
+      {% endif %}
+
+        
     </p>
     
 

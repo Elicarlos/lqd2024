@@ -85,6 +85,7 @@ class DocumentoFiscal(models.Model):
     observacao = models.TextField(verbose_name=u'Observação', max_length=1000, blank=True, null=True , default='Nenhuma')
     #impressaoHab = models.BooleanField(verbose_name=u'Status', default=False)
     qtdeCupom = models.IntegerField(blank=True, null=True, editable=False)
+    posto_trabalho = models.ForeignKey(PostoTrabalho, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Posto de Trabalho")
 
     def __str__(self):
         return 'Documento: {}'.format(self.numeroDocumento)

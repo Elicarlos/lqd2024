@@ -12,11 +12,12 @@
         {% bootstrap_field  lojista_form.IELojista layout='horizontal' show_help=False %}
         {% bootstrap_field  lojista_form.fantasiaLojista layout='horizontal' show_help=False %}
         {% bootstrap_field  lojista_form.razaoLojista layout='horizontal' show_help=False %}
-        {% bootstrap_field  lojista_form.ramoAtividade layout='horizontal' show_help=False  %}
+        {% bootstrap_field  lojista_form.ramoAtividade layout='horizontal' show_help=False  %}        
+        {% bootstrap_field lojista_form.localizacao layout='horizontal' show_help=True %}
 
         {% csrf_token %}
         <input type="submit" class="btn btn-primary btn-lg" value="Salvar">
-            <a type="button" class="btn" href="{% url 'lojista:homepage' %}">Cancelar</button>
+            <a type="button" class="btn" href="{% url 'lojista:homepage' %}">Cancelar</button></a>
       </div>
     </form>
 {% endblock %}

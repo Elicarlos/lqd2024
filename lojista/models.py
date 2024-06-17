@@ -31,6 +31,7 @@ class RamoAtividade(models.Model):
 class Localizacao(models.Model):
     nome = models.CharField(max_length=250)
     descricao = models.TextField(blank=True)
+    CadastradoPor   = CurrentUserField(verbose_name=u'Cadastrado Por', editable=False)
     
     def __str__(self):
         return self.nome
@@ -43,7 +44,7 @@ class Lojista(models.Model):
     razaoLojista    = models.CharField(verbose_name=u'Razão Social*', max_length=200, blank=True, null=True, help_text=u'Razão Social')
     fantasiaLojista = models.CharField(verbose_name=u'Nome Fantasia*', max_length=200, blank=False, help_text=u'Nome Fantasia')
     ramoAtividade   = models.ForeignKey('RamoAtividade', verbose_name=u'Ramo de Atividade*', on_delete=models.SET_NULL, null=True)
-    Localizacao  = models.ForeignKey(Localizacao, on_delete=models.SET_NULL, null=True,blank=True)
+    localizacao  = models.ForeignKey(Localizacao, on_delete=models.SET_NULL, null=True,blank=True)
     dataCadastro    = models.DateTimeField(verbose_name=u'Cadastrado em', auto_now_add=True, editable=False)   #nao vai aparecer na tela
     CadastradoPor   = CurrentUserField(verbose_name=u'Cadastrado Por', editable=False)
     endereco        = models.CharField(verbose_name=u'Endereço', max_length=150, blank=True)

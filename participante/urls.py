@@ -95,6 +95,8 @@ urlpatterns = [
 
 
     path('consulta-cep/', consulta_cep, name='consulta_cep'),
+    
+    path('definir_posto/', views.definir_posto, name='definir_posto')
 
     #TICKET
     # path('gerarticket/', views.gerarticket, name='gerarticket'),

@@ -1,0 +1,14 @@
+{% extends "mobile.html" %}
+
+{% block title %}Localização{% endblock %}
+
+{% block content %}
+    <h1 style="margin-top: 70px;">Localizaçoes cadastradas</h1>
+    <div id="user-list">
+        {% for localizacao in localizacao %}
+            <div class="user">
+                <a href="#"><h2>{{ localizacao.nome }}</h2></a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

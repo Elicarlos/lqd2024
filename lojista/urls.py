@@ -22,7 +22,9 @@ urlpatterns = [
     #re_path(r'^search/(?P<cpf>[-\w]+)$', views.search_cpf, name='searchbycpf'),
     # Ramo de atividades pathpatterns
     path('registeratividade/', views.registeratividade, name='registeratividade'),
+    path('registerlocalizacao/', views.register_localizacao, name='register_localizacao'),
     path('listatividade/', views.listatividade, name='listatividade'),
+     path('lista_localizacao/', views.lista_localizacao, name='lista_localizao'),
     path('lojistas-interessados/', views.lista_interessado, name='lista_interessado'),
     path('marcar_como_atendido/<int:adesao_id>/', views.marcar_como_atendido, name='marcar_como_atendido'),
 

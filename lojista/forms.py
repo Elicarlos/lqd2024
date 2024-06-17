@@ -39,6 +39,15 @@ class RamoAtividadeRegistrationForm(forms.ModelForm):
             'CadastradoPor': forms.HiddenInput,
         }
         
+class LocalizacaoRegistrationForm(forms.ModelForm):
+
+    class Meta:
+        model = Localizacao
+        fields = '__all__'
+        widgets = {
+            'CadastradoPor': forms.HiddenInput,
+        }
+        
 class FormLojistaAdesao(forms.ModelForm):
     
     class Meta:

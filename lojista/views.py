@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from participante.forms import ProfileEditForm, UserEditForm
-from .forms import LojistaRegistrationForm, RamoAtividadeRegistrationForm
-from .models import Lojista, RamoAtividade, AdesaoLojista
+from .forms import LojistaRegistrationForm, RamoAtividadeRegistrationForm, LocalizacaoRegistrationForm
+from .models import Localizacao, Lojista, RamoAtividade, AdesaoLojista
 from django.contrib.auth.decorators import user_passes_test
 from .filters import LojistaFilter
 from django.db.models.functions import Lower, Upper
@@ -113,7 +113,12 @@ def homepage(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def register(request):
+    lojista = Lojista.objects.all()
+    
+    for l in lojista:
+        print(dir(l))
     if request.method == 'POST':
+        print(request.POST)
         lojista_form = LojistaRegistrationForm(request.POST)
         if lojista_form.is_valid():
             # Create a new user object but avoid saving it yet
@@ -123,6 +128,9 @@ def register(request):
             return render(request,
                           'lojista/register_done.html',
                           {'new_lojista': new_lojista})
+            
+        else:
+            print(lojista_form.errors)
 
     else:
         lojista_form = LojistaRegistrationForm()
@@ -178,6 +186,7 @@ def lojistalist(request):
 @user_passes_test(lambda u: u.is_superuser)
 def registeratividade(request):
     if request.method == 'POST':
+        
         ramoatividade_form = RamoAtividadeRegistrationForm(request.POST)
 
         if ramoatividade_form.is_valid():
@@ -188,9 +197,30 @@ def registeratividade(request):
             return render(request,
                           'lojista/register_ramo_atividade_done.html',
                           {'new_ramoatividade': new_ramoatividade})
+            
     else:
         ramoatividade_form = RamoAtividadeRegistrationForm()
     return render(request, 'lojista/register_ramo_atividade.html', {'ramoatividade_form': ramoatividade_form})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def register_localizacao(request):
+    if request.method == 'POST':
+        
+        localizacao_form = LocalizacaoRegistrationForm(request.POST)
+
+        if localizacao_form.is_valid():
+            # Create a new user object but avoid saving it yet
+            nova_localizacao = localizacao_form.save(commit=False)
+            # Save the User object
+            nova_localizacao.save()
+            return render(request,
+                          'lojista/register_localizacao_done.html',
+                          {'nova_localizacao': nova_localizacao})
+            
+    else:
+        localizacao_form = LocalizacaoRegistrationForm()
+    return render(request, 'lojista/registro_localizacao.html', {'localizacao_form': localizacao_form})
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -198,6 +228,13 @@ def listatividade(request):
     ramosatividade = RamoAtividade.objects.all()
     return render(request, 'lojista/list_ramo_atividade.html', {'section': 'ramoatividade',
                                                       'ramosatividade': ramosatividade})
+    
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def lista_localizacao(request):
+    localizacao = Localizacao.objects.all()
+    return render(request, 'lojista/list_localizacao.html', {'section': 'localizacao',
+                                                      'localizacao': localizacao})
     
 
 @login_required
