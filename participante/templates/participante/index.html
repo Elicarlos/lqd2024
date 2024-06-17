@@ -42,6 +42,11 @@
 {% block css %}
 	
 <style>
+
+	.custom-input {
+		height: 4rem;
+		border-radius: 0px;
+	}
 	#maquineta {
 		margin-top: 0px;
 		margin-left: auto;
@@ -555,32 +560,46 @@
 					{% endfor %}
 				</div>
 				{% endif %} -->
-				{% if form_adesao.errors %}
-<div class="error-summary">
-    <ul>
-    {% for field in form_adesao %}
-        {% for error in field.errors %}
-            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-        {% endfor %}
-    {% endfor %}
-    </ul>
-</div>
-{% endif %}
+			{% if form_adesao.errors %}
+			<div class="error-summary">
+				<ul>
+				{% for field in form_adesao %}
+					{% for error in field.errors %}
+						<li><strong>{{ field.label }}:</strong> {{ error }}</li>
+					{% endfor %}
+				{% endfor %}
+				</ul>
+			</div>
+			{% endif %}
 			</div>
 			
 			<form method="post" id="formAdesao" class="text-left">
 				{% csrf_token %}
                 <input type="hidden" name="form_type" value="form_adesao">
 
-				<input name="cnpj" type="text" class="col-md-6" placeholder="Seu CNPJ *" id="cnpj">
-				<input name="razao_social" type="text" class="col-md-12" placeholder="Razão Social *" id="razao_social">
-				<input name="fantasia" type="text" class="col-md-12" placeholder="Fantasia *" id="fantasia">
-				<input name="email" type="email" class="col-md-6" placeholder="Email *" id="email">
-				<input name="telefone" type="tel" class="col-md-6" placeholder="Telefone *" id="telefone">			
-				<!-- <button type="submit" name="submit" id="submit" class="contact submit btn btn-primary btn-xl">Cadastrar</button> -->
-				<div class="form-group text-right">
-					<button class="btn btn-primary">Faça sua Adesão</button>
-				</div> 
+				<div class="form-group">
+					<input name="cnpj" type="text" class="form-control custom-input" placeholder="Seu CNPJ *" id="cnpj">
+				</div>
+				<div class="form-group">
+					<input name="razao_social" type="text" class="form-control custom-input" placeholder="Razão Social *" id="razao_social">
+				</div>
+
+				<div class="form-group">
+					<input name="fantasia" type="text" class="form-control custom-input" placeholder="Fantasia *" id="fantasia">
+				</div>
+
+				<div class="form-group">
+					<input name="email" type="email" class="form-control custom-input" placeholder="Email *" id="email">
+				</div>
+
+				<div class="form-group">
+					<input name="telefone" type="tel" class="form-control custom-input" placeholder="Telefone *" id="telefone">
+				</div>						
+				<!-- <input type="submit" id="submit" class="contact submit btn btn-primary btn-xl" value="FAÇA SUA ADESÃO"> -->
+				 <div class="text-right">
+					<button type="submit" class="contact submit btn btn-primary btn-xl">FAÇA SUA ADESÃO</button>
+				 </div>
+							
 			</form>
 			<div id="adesao-message"></div>
 		</div>
@@ -711,11 +730,36 @@
 					console.log(xhr.status + ": " + xhr.responseText);
 				}
 			});
-		});
-
-		
-		
+		});		
 	});
+
+	$(document).on('submit', '#formAdesao', function(event){
+		event.preventDefault()
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'participante:homepage' %}",
+			data: $(this).serialize(),
+			success:function(json){
+            document.getElementById("post-form").reset();
+            $(".posts").prepend('<div class="col-md-6">'+
+                '<div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">' +
+                    '<div class="col p-4 d-flex flex-column position-static">' +
+                        '<h3 class="mb-0">' + json.title + '</h3>' +
+                        '<p class="mb-auto">' + json.description + '</p>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' 
+            )
+        },
+        error : function(xhr,errmsg,err) {
+        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+    }
+			
+				
+			
+		});
+	});
+
 </script>
 </body>
 </html>

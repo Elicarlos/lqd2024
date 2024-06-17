@@ -215,8 +215,8 @@ def homepage(request):
             'lf': login_form,
             'form_adesao': form_adesao,
         }
-    return render(request, 'participante/coming_soon.html', context)    
-    # return render(request, 'participante/index.html', context)    
+    # return render(request, 'participante/coming_soon.html', context)    
+    return render(request, 'participante/index.html', context)    
     # return render(request, 'participante/lojista_interessado.html', context)
         
                 
