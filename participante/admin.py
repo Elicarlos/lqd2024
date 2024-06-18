@@ -40,7 +40,7 @@ class ProfileAdmin(ImportExportModelAdmin):
     list_display = ['user', 'date_of_birth', 'photo', 'CHOICES_SEXO', 'nome', 'RG', 'CPF', 'sexo', 'foneFixo',
                     'foneCelular1', 'foneCelular2', 'foneCelular3', 'whatsapp', 'facebook', 'twitter',
                     'endereco', 'enderecoNumero', 'enderecoComplemento', 'bairro', 'cidade', 'estado', 'CEP', 'cadastradoPor',
-                    'dataCadastro', 'observacao', 'pergunta', 'ativo']
+                    'dataCadastro', 'observacao', 'pergunta', 'ativo', 'posto_trabalho']
     search_fields = ('CPF', 'nome')
     resource_class = ProfileResource
 

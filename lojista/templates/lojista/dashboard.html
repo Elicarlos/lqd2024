@@ -30,10 +30,19 @@
   </div>
 </div>
 
+<!-- Exibir posto de trabalho selecionado -->
+{% if user.profile.posto_trabalho %}
+  <p>Posto de trabalho selecionado: {{ user.profile.posto_trabalho.nome }}</p>
+{% endif %}
+
 {% block scripts %}
 <script>
   $(document).ready(function() {
       {% if show_popup %}
+      $('#selectWorkstationModal').modal({
+          backdrop: 'static',
+          keyboard: false
+      });
       $('#selectWorkstationModal').modal('show');
       {% endif %}
       
@@ -43,7 +52,9 @@
               method: 'POST',
               data: $('#selectWorkstationForm').serialize(),
               success: function(data) {
+                  console.log(data);
                   $('#selectWorkstationModal').modal('hide');
+                  location.reload();  // Recarregar a página para mostrar o posto de trabalho selecionado
               },
               error: function(xhr, status, error) {
                   console.error(error);
@@ -53,8 +64,6 @@
   });
 </script>
 {% endblock %}
-
-
 <h1></h1>
 <h1 style="margin-top: 70px;">Liquida Teresina</h1>
 
@@ -92,6 +101,9 @@
 
     <h1>Lojistas</h1>
     <p>
+      {% if user.profile.posto_trabalho %}
+  <p>Posto de trabalho selecionado: {{ user.profile.posto_trabalho.nome }}</p>
+{% endif %}
 
       {% if is_backoffice or is_gerente %}
       <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "lojista:register" %}">

@@ -152,15 +152,32 @@ def register2(request):
 #     #return render(request, 'participante/index.html', {'section': 'homepage', 'lf': login_form})
 #     # Cadastro de Lojista Interessados
 #     return render(request, 'participante/lojista_interessado.html', {'section': 'homepage', 'lf': login_form})
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def definir_posto(request):
     if request.method == "POST":
         posto_id = request.POST.get('posto_trabalho')
+        print('ID do posto:', posto_id)
         posto = get_object_or_404(PostoTrabalho, id=posto_id)
-        request.session['posto_trabalho'] = posto.id
-        return HttpResponse('Salvo com sucesso')
-    return HttpResponse('home')
+        print('Posto de trabalho:', posto)
+        
+        # Verifique se o usuário tem um perfil associado
+        try:
+            profile = request.user.profile
+            print('Perfil do usuário:', profile)
+            profile.posto_trabalho = posto
+            profile.save(update_fields=['posto_trabalho'])
+            logger.info(f'Posto de trabalho {posto.nome} salvo no perfil do usuário {request.user.username}')
+            print('Posto de trabalho salvo no perfil:', profile.posto_trabalho)
+            return JsonResponse({'success': 'Posto de trabalho salvo com sucesso!'})
+        except Profile.DoesNotExist:
+            print('Perfil não encontrado para o usuário:', request.user.username)
+            return JsonResponse({'error': 'Perfil não encontrado'}, status=404)
+        
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 def homepage(request):
     
