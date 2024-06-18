@@ -53,7 +53,7 @@ urlpatterns = [
 
     # path('cadastrar/', views.register, name='register'),
     # Removido final de campanha
-    path('cadastro/', views.register, name='register'),
+    path('cadastrosaasasasaseerrwrqwrq/', views.register, name='register'),
     path('register/', views.register2, name='register-op'),
     path('edit/', views.edit, name='edit'),
 

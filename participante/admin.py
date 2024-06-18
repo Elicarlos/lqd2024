@@ -42,11 +42,14 @@ class ProfileAdmin(ImportExportModelAdmin):
                     'endereco', 'enderecoNumero', 'enderecoComplemento', 'bairro', 'cidade', 'estado', 'CEP', 'cadastradoPor',
                     'dataCadastro', 'observacao', 'pergunta', 'ativo', 'posto_trabalho']
     search_fields = ('CPF', 'nome')
+    readonly_fields = ('posto_trabalho',)
     resource_class = ProfileResource
 
 class DocumentoFiscalAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ['user', 'numeroDocumento', 'lojista', 'vendedor', 'dataDocumento', 'valorDocumento', 'compradoREDE', 'compradoMASTERCARD',
      'valorREDE','valorMASTERCARD', 'valorVirtual', 'dataCadastro', 'cadastradoPor']
+    
+    readonly_fields = ('posto_trabalho',)
 
     search_fields = ('numeroDocumento', 'user__username',)
     resource_class = DocumentoFiscalResource

@@ -159,25 +159,26 @@ logger = logging.getLogger(__name__)
 @login_required
 def definir_posto(request):
     if request.method == "POST":
-        posto_id = request.POST.get('posto_trabalho')
-        print('ID do posto:', posto_id)
-        posto = get_object_or_404(PostoTrabalho, id=posto_id)
-        print('Posto de trabalho:', posto)
-        
-        # Verifique se o usuário tem um perfil associado
-        try:
-            profile = request.user.profile
-            print('Perfil do usuário:', profile)
-            profile.posto_trabalho = posto
-            profile.save(update_fields=['posto_trabalho'])
-            logger.info(f'Posto de trabalho {posto.nome} salvo no perfil do usuário {request.user.username}')
-            print('Posto de trabalho salvo no perfil:', profile.posto_trabalho)
-            return JsonResponse({'success': 'Posto de trabalho salvo com sucesso!'})
-        except Profile.DoesNotExist:
-            print('Perfil não encontrado para o usuário:', request.user.username)
-            return JsonResponse({'error': 'Perfil não encontrado'}, status=404)
+        action = request.POST.get('action')
+        if action == 'reset_popup':
+            request.session['show_popup'] = ''
+            return JsonResponse({'success': True})
+        else:
+            posto_id = request.POST.get('posto_trabalho')
+            posto = get_object_or_404(PostoTrabalho, id=posto_id)
+            
+            try:
+                profile = request.user.profile
+                profile.posto_trabalho = posto
+                profile.save(update_fields=['posto_trabalho'])
+                request.session['show_popup'] = ''  # Remover a variável da sessão após salvar
+                return JsonResponse({'success': 'Posto de trabalho salvo com sucesso!'})
+            except Profile.DoesNotExist:
+                return JsonResponse({'error': 'Perfil não encontrado'}, status=404)
         
     return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+
 
 def homepage(request):
     
@@ -191,7 +192,7 @@ def homepage(request):
                 if user is not None and user.is_active:
                     login(request, user)
                     if user.is_superuser:
-                        request.session['show_popup'] = True
+                        request.session['show_popup'] = 'select_workstation'
                         
                     redirect_url = redirect('lojista:homepage' if user.is_superuser else 'participante:dashboard').url
                     return JsonResponse({'redirect_url': redirect_url})
@@ -536,13 +537,14 @@ def validadocfiscal(request, id):
             new_doc = documentofiscal_form.save(commit=False)
             new_doc.qtde = int(new_doc.get_cupons())
             new_doc.status = True
+            new_doc.posto_trabalho = request.user.profile.posto_trabalho
             impressaoHab = True
             new_doc.save()
             # ticket = Ticket(User, user=instance.user)
             # print(ticket)
             if not new_doc.pendente:
                 for x in range(new_doc.qtde):
-                    cupom = Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user)
+                    cupom = Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user, posto_trabalho=request.user.profile.posto_trabalho)
             # subject = "Você já está concorrendo! Liquida Teresina 2024"
             # body = "Seus cupons já foram validados e impressos agora é só aguardar o sorteio"
             # email = EmailMessage(subject, body, to=[new_doc.user.email])
