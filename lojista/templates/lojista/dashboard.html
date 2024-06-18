@@ -3,6 +3,58 @@
 {% block title %}Liquida Teresina{% endblock %}
 
 {% block content %}
+
+<div id="selectWorkstationModal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Selecione o Posto de Trabalho</h5>
+          </div>
+          <div class="modal-body">
+              <form id="selectWorkstationForm" method="POST">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label for="posto_trabalho">Posto de Trabalho:</label>
+                      <select class="form-control" id="posto_trabalho" name="posto_trabalho" required>
+                          {% for posto in postos_trabalho %}
+                          <option value="{{ posto.id }}">{{ posto.nome }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="confirmWorkstation">Selecionar</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+  $(document).ready(function() {
+      {% if show_popup %}
+      $('#selectWorkstationModal').modal('show');
+      {% endif %}
+      
+      $('#confirmWorkstation').click(function() {
+          $.ajax({
+              url: "{% url 'participante:definir_posto' %}",
+              method: 'POST',
+              data: $('#selectWorkstationForm').serialize(),
+              success: function(data) {
+                  $('#selectWorkstationModal').modal('hide');
+              },
+              error: function(xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  });
+</script>
+{% endblock %}
+
+
 <h1></h1>
 <h1 style="margin-top: 70px;">Liquida Teresina</h1>
 

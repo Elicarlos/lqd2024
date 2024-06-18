@@ -51,6 +51,7 @@ class Profile(models.Model):
     ativo = models.BooleanField(default=True)
     pendente = models.BooleanField(default=True,verbose_name=u'Pendente' )
     termos_de_aceite = models.BooleanField(default=False,verbose_name=u'Termos de aceite para tratamento de dados pessoais' )
+    posto_de_trabalho = models.ForeignKey(PostoTrabalho, verbose_name="Posto de trabalho", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return 'Nome completo {}'.format(self.user.username)

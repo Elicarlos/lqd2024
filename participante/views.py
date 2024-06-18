@@ -163,9 +163,9 @@ def definir_posto(request):
     return HttpResponse('home')
 
 def homepage(request):
+    
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
-
         if form_type == 'form_login':
             login_form = LoginForm(request.POST)
             if login_form.is_valid():
@@ -173,6 +173,9 @@ def homepage(request):
                 user = authenticate(username=cd['username'], password=cd['password'])
                 if user is not None and user.is_active:
                     login(request, user)
+                    if user.is_superuser:
+                        request.session['show_popup'] = True
+                        
                     redirect_url = redirect('lojista:homepage' if user.is_superuser else 'participante:dashboard').url
                     return JsonResponse({'redirect_url': redirect_url})
                 else:

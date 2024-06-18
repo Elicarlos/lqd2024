@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import user_passes_test
 from .filters import LojistaFilter
 from django.db.models.functions import Lower, Upper
 from cupom.models import Cupom
-from participante.models import Profile
+from participante.models import PostoTrabalho, Profile
 from django.contrib.auth.models import User
 from participante.models import DocumentoFiscal
 from django.core.exceptions import ObjectDoesNotExist
@@ -100,7 +100,11 @@ def is_supervisor(user):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def homepage(request):
+    postos_trabalho = PostoTrabalho.objects.all()
+    show_popup = request.session.pop('show_popup', False)
     context = {
+        'show_popup': show_popup,
+        'postos_trabalho': postos_trabalho,
         'section': 'lojista',
         'is_operador': is_operador(request.user),
         'is_gerente': is_gerente(request.user),
