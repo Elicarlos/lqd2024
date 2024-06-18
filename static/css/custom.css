@@ -1,6 +1,11 @@
  body{
 	font-family: 'Barlow Semi Condensed', sans-serif;
 }
+
+.custom-input {
+    height: 4rem;
+    border-radius: 0px;
+}
 .main-section{
 	/* margin: 0 auto; */
 	margin-top:100px;

@@ -16,7 +16,7 @@
       Gerente{{ is_gerente }}
       Superivisor{{ is_supervisor }} {% endcomment %}
       {% if is_operador or is_supervisor or is_gerente%}
-      <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:register-op" %}">
+      <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url 'participante:register-op' %}">
         Adicionar Participante <span class="glyphicon glyphicon-plus"></span>
       </a>
       {% endif %}
@@ -24,13 +24,13 @@
         Ver Participantes <span class="glyphicon glyphicon-user"></span>
       </a> -->
       {% if is_operador or is_supervisor or is_gerente %}
-        <a type="button" id="mymodal" class="btn btn-info btn-lg" data-toggle="modal" href="{% url "participante:search_by_cpf" %}">
+        <a type="button" id="mymodal" class="btn btn-info btn-lg" data-toggle="modal" href="{% url 'participante:search_by_cpf' %}">
           Buscar participante <span class="glyphicon glyphicon-search"></span>
         </a>
       {% endif %}
       {% comment %} {% if request.user.is_staff %} {% endcomment %}
       {% if is_backoffice or is_supervisor or is_gerente %}
-      <a type="button" id="mymodal" class="btn btn-warning btn-lg" data-toggle="modal" href="{% url "lojista:search_by_doc" %}">
+      <a type="button" id="mymodal" class="btn btn-warning btn-lg" data-toggle="modal" href="{% url 'lojista:search_by_doc' %}">
         Reimprimir <span class="glyphicon glyphicon-print"></span>
       </a>
       {% endif %}

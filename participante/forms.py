@@ -19,8 +19,8 @@ class LoginForm(forms.Form):
 
 
 class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Senha* (mínimo de 8 caracteres)'}))
-    password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Confirmação de senha*'}))
+    password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Senha* (mínimo de 8 caracteres)', 'class': 'custom-input'}))
+    password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Confirmação de senha*', 'class': 'custom-input'}))
     username = BRCPFField(required=True, max_length=14, min_length=11, widget=forms.TextInput(attrs={'placeholder':'CPF*', 'autocomplete':'off',
                                                                                                 'class':'cpf', 'cpf':'id_CPF'}))
     email = forms.EmailField(required=True, widget=forms.TextInput(attrs={'placeholder':'Email*', 'autocomplete':'off'}))

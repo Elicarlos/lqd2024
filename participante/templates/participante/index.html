@@ -512,7 +512,7 @@
 <!-- Section Contact
 ================================================== -->
 <section id="adesao_lojista" style="margin-top: 10rem; margin-bottom: 10rem;">
-	<h2 class="section-heading text-center text-black"><b>CADASTRE-SE</b></h2>
+	<h2 class="section-heading text-center text-black"><b id="ancora_adesao_lojista">CADASTRE-SE</b></h2>
 		<hr class="primary">
 		<BR></BR><br>
 <div class="container">
@@ -573,27 +573,36 @@
 			{% endif %}
 			</div>
 			
+
+			<div id="alert-container" class="mt-3">
+				<!-- Mensagens serão adicionadas dinamicamente aqui -->
+			</div>
 			<form method="post" id="formAdesao" class="text-left">
 				{% csrf_token %}
                 <input type="hidden" name="form_type" value="form_adesao">
 
 				<div class="form-group">
-					<input name="cnpj" type="text" class="form-control custom-input" placeholder="Seu CNPJ *" id="cnpj">
+					<label for="cnpj">CNPJ:</label>
+					<input name="cnpj" type="text" class="form-control custom-input cnpj" placeholder="Seu CNPJ *" id="cnpj" required="true">				
 				</div>
 				<div class="form-group">
-					<input name="razao_social" type="text" class="form-control custom-input" placeholder="Razão Social *" id="razao_social">
-				</div>
-
-				<div class="form-group">
-					<input name="fantasia" type="text" class="form-control custom-input" placeholder="Fantasia *" id="fantasia">
+					<label for="razao_social">Razao Social</label>
+					<input name="razao_social" type="text" class="form-control custom-input" placeholder="Razão Social *" id="razao_social" required="true">
 				</div>
 
 				<div class="form-group">
-					<input name="email" type="email" class="form-control custom-input" placeholder="Email *" id="email">
+					<label for="fantasia">Fantasia</label>
+					<input name="fantasia" type="text" class="form-control custom-input" placeholder="Fantasia *" id="fantasia" required="true">
 				</div>
 
 				<div class="form-group">
-					<input name="telefone" type="tel" class="form-control custom-input" placeholder="Telefone *" id="telefone">
+					<label for="email">Email</label>
+					<input name="email" type="email" class="form-control custom-input" placeholder="Email *" id="email" required="true">
+				</div>
+
+				<div class="form-group">
+					<label for="telefone">Telefone</label>
+					<input name="telefone" type="tel" class="form-control custom-input phone_with_ddd" placeholder="Telefone *" id="telefone" required="true">
 				</div>						
 				<!-- <input type="submit" id="submit" class="contact submit btn btn-primary btn-xl" value="FAÇA SUA ADESÃO"> -->
 				 <div class="text-right">
@@ -601,7 +610,7 @@
 				 </div>
 							
 			</form>
-			<div id="adesao-message"></div>
+			
 		</div>
 	</div>
 </div>
@@ -719,46 +728,93 @@
 				type: "POST",
 				data: $(this).serialize(),
 				success: function(response) {
+					console.log(response)
 					if (response.login_error) {
-						$('#password-errors').html(response.errors.password);
+						showAlert_login('danger', response.errors.__all__[0]);
 						$('#myModal').modal('show');
 					} else {
 						window.location.href = response.redirect_url;
 					}
 				},
 				error: function(xhr, errmsg, err) {
-					console.log(xhr.status + ": " + xhr.responseText);
-				}
+                console.log(xhr.status + ": " + xhr.responseText);
+                showAlert_login('danger', 'Erro ao processar o formulário de login. Por favor, tente novamente.');
+            	}
 			});
 		});		
 	});
 
+	function showAlert_login(type, message) {
+        var alertDiv = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
+            message +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            '</div>';
+
+        $('#alert-container_login').html(alertDiv);
+    }
+
+
 	$(document).on('submit', '#formAdesao', function(event){
-		event.preventDefault()
+		event.preventDefault();
+
 		$.ajax({
 			type: 'POST',
 			url: "{% url 'participante:homepage' %}",
 			data: $(this).serialize(),
-			success:function(json){
-            document.getElementById("post-form").reset();
-            $(".posts").prepend('<div class="col-md-6">'+
-                '<div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">' +
-                    '<div class="col p-4 d-flex flex-column position-static">' +
-                        '<h3 class="mb-0">' + json.title + '</h3>' +
-                        '<p class="mb-auto">' + json.description + '</p>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' 
-            )
+			success:function(response){	
+											
+            // document.getElementById("formAdesao").reset();
+            // $(".posts").prepend('<div class="col-md-6">'+
+            //     '<div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">' +
+            //         '<div class="col p-4 d-flex flex-column position-static">' +
+            //             '<h3 class="mb-0">' + json.title + '</h3>' +
+            //             '<p class="mb-auto">' + json.description + '</p>' +
+            //         '</div>' +
+            //     '</div>' +
+            // '</div>' 
+            // );
+			if (response.error){
+				showAlert('danger', response.message)
+		
+			} else if (response.success){
+				showAlert('success', response.message)
+				document.getElementById("formAdesao").reset();
+				$('html, body').animate({
+                scrollTop: $('#ancora_adesao_lojista').offset().top
+            	}, 500);
+			} else if (response.login_error){
+				showAlert('danger', response.error.__all__[0])
+			}		
         },
-        error : function(xhr,errmsg,err) {
-        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-    }
-			
-				
-			
-		});
+        error: function(xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText);
+                showAlert('danger', 'Erro ao processar o formulário. Por favor, tente novamente.');
+            }		
 	});
+	});
+
+	function showAlert(type, message) {
+        var alertDiv = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
+            message +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            '</div>';
+
+        $('#alert-container').html(alertDiv);
+    }
+	
+
+	$(document).ready(function(){
+		$('.cnpj').mask('00.000.000/0000-00', {reverse: true})
+	})
+
+	$(document).ready(function(){
+		$('.phone_with_ddd').mask('(00) 00000-0000');
+	})
+
 
 </script>
 </body>

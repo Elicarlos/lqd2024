@@ -48,8 +48,7 @@ class LocalizacaoRegistrationForm(forms.ModelForm):
             'CadastradoPor': forms.HiddenInput,
         }
         
-class FormLojistaAdesao(forms.ModelForm):
-    
+class FormLojistaAdesao(forms.ModelForm):    
     class Meta:
         model = AdesaoLojista
         fields = '__all__'

@@ -112,11 +112,7 @@ def homepage(request):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def register(request):
-    lojista = Lojista.objects.all()
-    
-    for l in lojista:
-        print(dir(l))
+def register(request):  
     if request.method == 'POST':
         print(request.POST)
         lojista_form = LojistaRegistrationForm(request.POST)
