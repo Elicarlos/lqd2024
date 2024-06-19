@@ -138,7 +138,7 @@ class UserAddFiscalDocForm(forms.ModelForm):
     photo2 = forms.FileField(label='Comprovante do cartão', required=False)
     class Meta:
         model = DocumentoFiscal
-        fields = ('lojista_cnpj', 'vendedor', 'numeroDocumento', 'dataDocumento', 'valorDocumento', 'compradoREDE', 'compradoMASTERCARD',
+        fields = ('lojista_cnpj', 'vendedor', 'numeroDocumento', 'dataDocumento', 'valorDocumento', 'compradoMASTERCARD', 'compradoREDE',
                     'photo', 'photo2')
         widgets = {
             #'lojista': forms.HiddenInput,
@@ -167,19 +167,19 @@ class UserAddFiscalDocFormSuperuser(UserAddFiscalDocForm):
 class DocumentoFiscalEditFormOp(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('photo','photo2', 'user', 'lojista')
+        exclude = ('photo','photo2', 'user', 'lojista', 'posto_trabalho')
         fields = '__all__'
 
 class DocumentoFiscalEditForm(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('pendente','user', 'lojista', 'observacao')
+        exclude = ('pendente','user', 'lojista', 'observacao', 'posto_trabalho')
         fields = '__all__'
 
 class DocumentoFiscalValidaForm(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('user','qtdeCupom', )
+        exclude = ('user','qtdeCupom', 'posto_trabalho')
         fields = '__all__'
         widgets = {
             'status': forms.HiddenInput,

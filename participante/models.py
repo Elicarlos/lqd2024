@@ -1,14 +1,27 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from lojista.models import Lojista
 from django.urls import reverse
 from django.core import validators
 #from django.contrib.auth import get_user_model
 from django_currentuser.db.models import CurrentUserField
 from django.core.mail import EmailMessage
+from django.utils.translation import gettext_lazy as _
+import datetime
 
 
+def validate_promotional_period(value):
+    promotion_start = datetime.date(2024, 6, 28)
+    promotion_end = datetime.date(2024, 7, 7)
+    
+    if not (promotion_start <= value <= promotion_end):
+        raise ValidationError(
+            _('A data do documento deve estar entre %(start)s e %(end)s'),
+            params={'start': promotion_start, 'end': promotion_end},
+        )
+    
 
 
 class PostoTrabalho(models.Model):
@@ -70,7 +83,7 @@ class DocumentoFiscal(models.Model):
     lojista =  models.ForeignKey(Lojista, related_name='rel_lojista', null=False, blank=False, default=1, on_delete=models.PROTECT)
     vendedor = models.CharField(verbose_name=u'Nome do Vendedor', max_length=50, blank=True, null=True)
     numeroDocumento = models.CharField(verbose_name=u'Número do Documento', max_length=50, blank=False, null=False, unique=False)
-    dataDocumento = models.DateField(verbose_name=u'Data do Documento', null=False, blank=False)
+    dataDocumento = models.DateField(verbose_name=u'Data do Documento', null=False, blank=False, validators=[validate_promotional_period])
     valorDocumento = models.DecimalField(verbose_name=u'Valor do Documento', max_digits=15, decimal_places=2, blank=False, default=0, validators=[validators.MinValueValidator(50,message='O valor do documento deve ser maior que R$ 50,00 reais!')])
     compradoREDE = models.BooleanField(verbose_name=u'Comprou na maquininha da PagBank?', default=False)
     compradoMASTERCARD = models.BooleanField(verbose_name=u'Comprou com Elo?', default=False)
@@ -87,6 +100,8 @@ class DocumentoFiscal(models.Model):
     #impressaoHab = models.BooleanField(verbose_name=u'Status', default=False)
     qtdeCupom = models.IntegerField(blank=True, null=True, editable=False)
     posto_trabalho = models.ForeignKey(PostoTrabalho, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Posto de Trabalho")
+    
+    
 
     def __str__(self):
         return 'Documento: {}'.format(self.numeroDocumento)

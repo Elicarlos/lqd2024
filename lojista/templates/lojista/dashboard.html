@@ -41,6 +41,11 @@
       {% if show_popup %}
       $('#selectWorkstationModal').modal('show');
       {% endif %}
+
+      $('#trocarPostoLink').click(function() {
+        $('#selectWorkstationModal').modal('show');
+          return false;  // Evita o comportamento padrão do link
+      });
       
       $('#confirmWorkstation').click(function() {
           $.ajax({
@@ -63,6 +68,9 @@
 
 <h1></h1>
 <h1 style="margin-top: 70px;">Liquida Teresina</h1>
+{% if user.profile.posto_trabalho %}
+<p>Trocar posto de trabalho:  <a id="trocarPostoLink" href="{% url 'participante:definir_posto' %}">{{ user.profile.posto_trabalho.nome }}</a></p>
+{% endif %}
 
 
  <p>Bem vindo a sua conta do Liquida Teresina Colaborador. Agora você pode <a href="{% url 'participante:password_change' %}">mudar a sua senha</a>.</p>
@@ -98,9 +106,7 @@
 
     <h1>Lojistas</h1>
     <p>
-            {% if user.profile.posto_trabalho %}
-        <p>Posto de trabalho: {{ user.profile.posto_trabalho.nome }}</p>
-      {% endif %}
+        
 
       {% if is_backoffice or is_gerente %}
       <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "lojista:register" %}">

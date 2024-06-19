@@ -1,8 +1,24 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from django_currentuser.db.models import CurrentUserField
 from django.urls import reverse
+
+
+import datetime
+
+
+def validate_promotional_period(value):
+    promotion_start = datetime.date(2024, 6, 28)
+    promotion_end = datetime.date(2024, 7, 7)
+    
+    if not (promotion_start <= value <= promotion_end):
+        raise ValidationError(
+            _('A data do documento deve estar entre %(start)s e %(end)s'),
+            params={'start': promotion_start, 'end': promotion_end},
+        )
+    
 
 class RamoAtividade(models.Model):
     """
