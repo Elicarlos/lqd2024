@@ -167,19 +167,19 @@ class UserAddFiscalDocFormSuperuser(UserAddFiscalDocForm):
 class DocumentoFiscalEditFormOp(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('photo','photo2', 'user', 'lojista', 'posto_trabalho')
+        exclude = ('photo','photo2', 'user', 'lojista', 'posto_trabalho', 'enviado_por_operador', 'pendente')
         fields = '__all__'
 
 class DocumentoFiscalEditForm(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('pendente','user', 'lojista', 'observacao', 'posto_trabalho')
+        exclude = ('pendente','user', 'lojista', 'observacao', 'posto_trabalho','enviado_por_operador')
         fields = '__all__'
 
 class DocumentoFiscalValidaForm(forms.ModelForm):
     class Meta:
         model = DocumentoFiscal
-        exclude = ('user','qtdeCupom', 'posto_trabalho')
+        exclude = ('user','qtdeCupom', 'posto_trabalho','enviado_por_operador')
         fields = '__all__'
         widgets = {
             'status': forms.HiddenInput,

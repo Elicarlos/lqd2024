@@ -43,7 +43,7 @@
                 {% if not doc.status %}
                   <td style="text-align: center; vertical-align:middle !important">{{ doc.numeroDocumento }}</a></td>                  
                   {% else %}
-                  <td style="text-align: center; vertical-align:middle !important"><a href="{{ doc.get_absolute_url_byop }}">{{ doc.numeroDocumento }}</a></td>
+                  <td style="text-align: center; vertical-align:middle !important">{{ doc.numeroDocumento }}</td>
                   
                 {% endif %}
                 <td style="text-align: center; vertical-align:middle !important">{{ doc.dataDocumento|date:"d/m/Y" }}</td>
@@ -171,4 +171,13 @@
       </table>
     </div>
 
+    <script>
+    
+      history.pushState(null, null, document.URL);
+      window.addEventListener('popstate', function () {
+          history.pushState(null, null, document.URL);
+      });
+  
+    </script>
+      
 {% endblock %}

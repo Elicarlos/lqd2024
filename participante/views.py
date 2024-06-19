@@ -236,6 +236,8 @@ def homepage(request):
         
                 
 
+   
+   
 
 def user_login(request):
     if request.method == 'POST':
@@ -368,38 +370,35 @@ def user_edit(request, id):
 @transaction.atomic
 def adddocfiscal(request):
     if request.method == 'POST':
-        documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
-        cnpj = documentoFiscal_form['lojista_cnpj'].value()
+        documentoFiscal_form = UserAddFiscalDocForm(request.POST,
+                                                    files=request.FILES)
+        cnpj = documentoFiscal_form['lojista_cnpj'].value()              
 
         try:
             lojista = Lojista.objects.get(CNPJLojista=cnpj)
             user = request.user
             if lojista:
                 if documentoFiscal_form.is_valid():
-                    try:
-                        # Create a new document object but avoid saving it yet
-                        new_documentoFiscal = documentoFiscal_form.save(commit=False)
-                        # Set the user
-                        new_documentoFiscal.user = user
-                        new_documentoFiscal.lojista = lojista
-                        new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
-                        # Save the doc object
-                        new_documentoFiscal.save()
-                        messages.success(request, 'Documento adicionado com sucesso!')
-                        return render(request,
-                                      'participante/doc_fiscal_done.html',
-                                      {'new_documentoFiscal': new_documentoFiscal})
-                    except IntegrityError:
-                        messages.error(request, 'Este documento já foi registrado para este lojista pelo usuário.')
-                else:
-                    messages.error(request, 'Ops! Parece que algo não está certo. Verifique se todas as informações estão corretas!')
+                    # Create a new document object but avoid saving it yet
+                    new_documentoFiscal = documentoFiscal_form.save(commit=False)
+                    # Set the user
+                    new_documentoFiscal.user = user
+                    new_documentoFiscal.lojista = lojista
+                    new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
+                    # Save the doc object
+                    new_documentoFiscal.save()
+                    messages.success(request, 'Documento adicionado com sucesso!')
+                    return render(request,
+                                  'participante/doc_fiscal_done.html',
+                                  {'new_documentoFiscal': new_documentoFiscal})
         except Lojista.DoesNotExist:
-            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
+            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'>     <b> |Informar ao Suporte|</b></a>")
             documentoFiscal_form = UserAddFiscalDocForm()
             return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
     else:
         documentoFiscal_form = UserAddFiscalDocForm()
     return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -429,10 +428,7 @@ def adddocfiscalbyop(request, id):
                         new_documentoFiscal.posto_trabalho = request.user.profile.posto_trabalho
                         new_documentoFiscal.enviado_por_operador = True
                         new_documentoFiscal.save()
-
-                        return render(request,
-                                      'participante/doc_fiscal_done_op.html',
-                                      {'new_documentoFiscal': new_documentoFiscal, 'participante': user_aux})
+                        return redirect('participante:user_detail', id=user.id)
                     except IntegrityError:
                         messages.error(request, 'Este documento já foi registrado para este lojista pelo usuário.')
                 else:
@@ -536,9 +532,8 @@ def editdocfiscalbyop(request, id):
 def validadocfiscal(request, id):
     if request.method == 'POST':
         instance = get_object_or_404(DocumentoFiscal, id=id)
-        documentofiscal_form = DocumentoFiscalValidaForm(instance=instance,data=request.POST,
-                                                                    files=request.FILES)
-        profile = get_object_or_404(Profile, user= instance.user)
+        documentofiscal_form = DocumentoFiscalValidaForm(instance=instance, data=request.POST, files=request.FILES)
+        profile = get_object_or_404(Profile, user=instance.user)
         docs = DocumentoFiscal.objects.filter(user=instance.user)
         pendente = documentofiscal_form['pendente'].value()
         if documentofiscal_form.is_valid() and not pendente:
@@ -546,32 +541,23 @@ def validadocfiscal(request, id):
             new_doc.qtde = int(new_doc.get_cupons())
             new_doc.status = True
             new_doc.posto_trabalho = request.user.profile.posto_trabalho
-            impressaoHab = True
             new_doc.save()
-            # ticket = Ticket(User, user=instance.user)
-            # print(ticket)
             if not new_doc.pendente:
                 for x in range(new_doc.qtde):
-                    cupom = Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user, posto_trabalho=request.user.profile.posto_trabalho)
-            # subject = "Você já está concorrendo! Liquida Teresina 2024"
-            # body = "Seus cupons já foram validados e impressos agora é só aguardar o sorteio"
-            # email = EmailMessage(subject, body, to=[new_doc.user.email])
-            # email.send()
-            # messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
-            return render(request, 'participante/detail.html', {'section': 'people','user': profile, 'docs': docs})
+                    Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user, posto_trabalho=request.user.profile.posto_trabalho)
+            messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
+            return redirect('participante:user_detail', id=profile.user.id)  # redirecionar para a página de detalhe
         elif documentofiscal_form.is_valid() and pendente:
             new_doc = documentofiscal_form.save(commit=False)
-            # new_doc.status = False
             new_doc.save()
-
             messages.info(request, 'O documento fiscal {} não foi validado por pendencias. Se está tudo certo com o documento, por favor repita novamente o procedimento de validação e desmarque a opção de pendente para que o mesmo seja validado! Se você encontrou pendêcias no documento em questão por favor não esqueça de descriminar a pendência no campo obsevações!'.format(new_doc.numeroDocumento))
-            return render(request, 'participante/detail.html', {'section': 'people','user': profile, 'docs': docs})
+            return redirect('participante:user_detail', id=profile.user.id)  # redirecionar para a página de detalhe
         else:
             messages.error(request, 'Ocorreu um erro durante o processo de validação verifique se não há algum dado incoerênte no formulario!')
     else:
         instance = get_object_or_404(DocumentoFiscal, id=id)
         documentofiscal_form = DocumentoFiscalValidaForm(instance=instance)
-    return render(request, 'participante/doc_fiscal_valida.html', {'documentofiscal_form': documentofiscal_form, 'doc':instance})
+    return render(request, 'participante/doc_fiscal_valida.html', {'documentofiscal_form': documentofiscal_form, 'doc': instance})
 
 
 @login_required
