@@ -29,6 +29,9 @@ import requests
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 
+from django.db import IntegrityError
+from django.db import transaction
+
 
 
 
@@ -180,8 +183,7 @@ def definir_posto(request):
 
 
 
-def homepage(request):
-    
+def homepage(request):    
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
         if form_type == 'form_login':
@@ -234,8 +236,6 @@ def homepage(request):
         
                 
 
-   
-   
 
 def user_login(request):
     if request.method == 'POST':
@@ -368,35 +368,38 @@ def user_edit(request, id):
 @transaction.atomic
 def adddocfiscal(request):
     if request.method == 'POST':
-        documentoFiscal_form = UserAddFiscalDocForm(request.POST,
-                                                    files=request.FILES)
-        cnpj = documentoFiscal_form['lojista_cnpj'].value()              
+        documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
+        cnpj = documentoFiscal_form['lojista_cnpj'].value()
 
         try:
             lojista = Lojista.objects.get(CNPJLojista=cnpj)
             user = request.user
             if lojista:
                 if documentoFiscal_form.is_valid():
-                    # Create a new document object but avoid saving it yet
-                    new_documentoFiscal = documentoFiscal_form.save(commit=False)
-                    # Set the user
-                    new_documentoFiscal.user = user
-                    new_documentoFiscal.lojista = lojista
-                    new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
-                    # Save the doc object
-                    new_documentoFiscal.save()
-                    messages.success(request, 'Documento adicionado com sucesso!')
-                    return render(request,
-                                  'participante/doc_fiscal_done.html',
-                                  {'new_documentoFiscal': new_documentoFiscal})
+                    try:
+                        # Create a new document object but avoid saving it yet
+                        new_documentoFiscal = documentoFiscal_form.save(commit=False)
+                        # Set the user
+                        new_documentoFiscal.user = user
+                        new_documentoFiscal.lojista = lojista
+                        new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
+                        # Save the doc object
+                        new_documentoFiscal.save()
+                        messages.success(request, 'Documento adicionado com sucesso!')
+                        return render(request,
+                                      'participante/doc_fiscal_done.html',
+                                      {'new_documentoFiscal': new_documentoFiscal})
+                    except IntegrityError:
+                        messages.error(request, 'Este documento já foi registrado para este lojista pelo usuário.')
+                else:
+                    messages.error(request, 'Ops! Parece que algo não está certo. Verifique se todas as informações estão corretas!')
         except Lojista.DoesNotExist:
-            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'>     <b> |Informar ao Suporte|</b></a>")
+            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
             documentoFiscal_form = UserAddFiscalDocForm()
             return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
     else:
         documentoFiscal_form = UserAddFiscalDocForm()
     return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
-
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -417,16 +420,21 @@ def adddocfiscalbyop(request, id):
             numerodoc = documentoFiscal_form['numeroDocumento'].value()
             lojista = Lojista.objects.get(CNPJLojista=cnpj)
             
-            if user_aux or lojista:
+            if user_aux and lojista:
                 if documentoFiscal_form.is_valid():
-                    new_documentoFiscal = documentoFiscal_form.save(commit=False)
-                    new_documentoFiscal.user = user_aux
-                    new_documentoFiscal.lojista = lojista
-                    new_documentoFiscal.save()
+                    try:
+                        new_documentoFiscal = documentoFiscal_form.save(commit=False)
+                        new_documentoFiscal.user = user_aux
+                        new_documentoFiscal.lojista = lojista
+                        new_documentoFiscal.posto_trabalho = request.user.profile.posto_trabalho
+                        new_documentoFiscal.enviado_por_operador = True
+                        new_documentoFiscal.save()
 
-                    return render(request,
-                                  'participante/doc_fiscal_done_op.html',
-                                  {'new_documentoFiscal': new_documentoFiscal, 'participante': user_aux})
+                        return render(request,
+                                      'participante/doc_fiscal_done_op.html',
+                                      {'new_documentoFiscal': new_documentoFiscal, 'participante': user_aux})
+                    except IntegrityError:
+                        messages.error(request, 'Este documento já foi registrado para este lojista pelo usuário.')
                 else:
                     messages.error(request, 'Ops! Parece que algo não está certo. Verifique se todas as informações estão corretas!')
             else:

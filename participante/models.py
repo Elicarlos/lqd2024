@@ -10,6 +10,8 @@ from django_currentuser.db.models import CurrentUserField
 from django.core.mail import EmailMessage
 from django.utils.translation import gettext_lazy as _
 import datetime
+from django.db import IntegrityError
+from django.db import transaction
 
 
 def validate_promotional_period(value):
@@ -100,6 +102,7 @@ class DocumentoFiscal(models.Model):
     #impressaoHab = models.BooleanField(verbose_name=u'Status', default=False)
     qtdeCupom = models.IntegerField(blank=True, null=True, editable=False)
     posto_trabalho = models.ForeignKey(PostoTrabalho, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Posto de Trabalho")
+    enviado_por_operador = models.BooleanField(default=False, verbose_name="Enviado por operador")
     
     
 
@@ -110,6 +113,10 @@ class DocumentoFiscal(models.Model):
         #ordering = ['Participante_Id', 'NumeroDocumento']
         verbose_name = (u'Documento Fiscal')
         verbose_name_plural = (u'Documentos Fiscais')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'numeroDocumento', 'lojista'], name='unique_user_numeroDocumento_lojista')
+        ]
+        
 
     def get_absolute_url(self):
         return reverse('participante:editdocfiscal', args=[self.id])

@@ -49,7 +49,7 @@ class DocumentoFiscalAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ['user', 'numeroDocumento', 'lojista', 'vendedor', 'dataDocumento', 'valorDocumento', 'compradoREDE', 'compradoMASTERCARD',
      'valorREDE','valorMASTERCARD', 'valorVirtual', 'dataCadastro', 'cadastradoPor']
     
-    readonly_fields = ('posto_trabalho',)
+    readonly_fields = ('posto_trabalho', 'enviado_por_operador')
 
     search_fields = ('numeroDocumento', 'user__username',)
     resource_class = DocumentoFiscalResource
