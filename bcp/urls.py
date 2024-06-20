@@ -5,7 +5,7 @@ Copyright: Adlibre Pty Ltd 2012
 License: See LICENSE for license information
 """
 
-from django.conf.urls import url
+
 from . import views
 from django.contrib.auth.views import *
 from django.urls import path, re_path

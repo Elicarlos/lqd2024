@@ -64,6 +64,7 @@ INSTALLED_APPS = (
     'logentry_admin',
     'parsley',
     'anymail',
+    'rest_framework'
 )
 
 
@@ -77,7 +78,24 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
+   
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://www.liquidateresina.com.br",
+    "https://seu-frontend-em-nextjs.com",  # Substitua pelo domínio do seu frontend
+]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 
 ROOT_URLCONF = 'liquida2018.urls'
 

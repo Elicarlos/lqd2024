@@ -10,8 +10,6 @@ from django_currentuser.db.models import CurrentUserField
 from django.core.mail import EmailMessage
 from django.utils.translation import gettext_lazy as _
 import datetime
-from django.db import IntegrityError
-from django.db import transaction
 
 
 def validate_promotional_period(value):
