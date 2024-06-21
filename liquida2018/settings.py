@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Teste
 # ALLOWED_HOSTS = ['127.0.0.1', 'www.liquidateresina.com.br', '.liquidateresina.com.br']
@@ -64,8 +64,12 @@ INSTALLED_APPS = (
     'logentry_admin',
     'parsley',
     'anymail',
-    'rest_framework'
+    'rest_framework',
+    
+  
+    
 )
+
 
 
 MIDDLEWARE = [
@@ -78,13 +82,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
+    
+  
    
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://www.liquidateresina.com.br",
-    "https://seu-frontend-em-nextjs.com",  # Substitua pelo domínio do seu frontend
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://www.liquidateresina.com.br",
+#     "https://seu-frontend-em-nextjs.com",  # Substitua pelo domínio do seu frontend
+# ]
 
 
 REST_FRAMEWORK = {

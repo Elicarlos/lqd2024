@@ -117,8 +117,7 @@ def homepage(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def register(request):  
-    if request.method == 'POST':
-        print(request.POST)
+    if request.method == 'POST':        
         lojista_form = LojistaRegistrationForm(request.POST)
         if lojista_form.is_valid():
             # Create a new user object but avoid saving it yet

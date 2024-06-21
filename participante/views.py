@@ -31,9 +31,8 @@ from django.http import JsonResponse
 
 from django.db import IntegrityError
 from django.db import transaction
-
-
-
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 
 
@@ -127,37 +126,6 @@ def register2(request):
          profile_form = ProfileRegistrationForm()
     return render(request, 'participante/register.html', {'user_form': user_form, 'profile_form': profile_form})
 
-
-
-# def homepage(request):
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         form_adesao = FormLojistaAdesao(request.POST)
-#         if form.is_valid():
-#             cd = form.cleaned_data
-#             user = authenticate(username=cd['username'], password=cd['password'])
-#             if user is not None:
-#                 if user.is_active and user.is_superuser:
-#                     login(request, user)                  
-                   
-#                     return redirect('lojista:homepage')   
-#                 elif user.is_active:
-#                     login(request, user)
-#                     return redirect('participante:dashboard')                    
-                            
-#             else:
-#                 login_form = LoginForm()
-#                 return render(request, 'participante/index.html', {'section': 'homepage', 'lf': login_form})
-#     else:
-#         login_form = LoginForm()
-    
-#     #return render(request, 'participante/coming_soon.html', {'section': 'homepage', 'lf': login_form})
-#     #return render(request, 'participante/index.html', {'section': 'homepage', 'lf': login_form})
-#     # Cadastro de Lojista Interessados
-#     return render(request, 'participante/lojista_interessado.html', {'section': 'homepage', 'lf': login_form})
-import logging
-
-logger = logging.getLogger(__name__)
 
 @login_required
 def definir_posto(request):
@@ -297,7 +265,7 @@ def register(request):
                               'participante/register_done.html',
                               {'new_user': new_profile})
 
-            print("Form invalido")
+       
     else:
         user_form = UserRegistrationForm()
         profile_form = ProfileRegistrationForm()
@@ -448,37 +416,7 @@ def adddocfiscalbyop(request, id):
             documentoFiscal_form = UserAddFiscalDocForm()
     
     return render(request, 'participante/doc_fiscal_add_op.html', {'documentoFiscal_form': documentoFiscal_form, 'participante': user})
-# @login_required
-# @user_passes_test(lambda u: u.is_superuser)
-# def adddocfiscalbyop(request, id):
-#     user = get_object_or_404(User, id=id)
-#     if request.method == 'POST':
-#         documentoFiscal_form = UserAddFiscalDocForm(request.POST,
-#                                                     files=request.FILES)
-#         cnpj = documentoFiscal_form['lojista_cnpj'].value()
-#         numerodoc = documentoFiscal_form['numeroDocumento'].value()
-#         if cnpj:
-#             lojista = get_object_or_404(Lojista, CNPJLojista=cnpj)
-#             user = get_object_or_404(User, id=id)
-#             if documentoFiscal_form.is_valid():
-#                 # Create a new document object but avoid saving it yet
-#                 new_documentoFiscal = documentoFiscal_form.save(commit=False)
-#                 # Set the user
-#                 new_documentoFiscal.user = user
-#                 new_documentoFiscal.lojista = lojista
-#                 # Save the doc object
-#                 new_documentoFiscal.save()
-#                 return render(request,
-#                               'participante/doc_fiscal_done_op.html',
-#                               {'new_documentoFiscal': new_documentoFiscal, 'participante': user})
-#             else:
-#                 messages.error(request, 'O documento {} já se encontra cadastrado na nossa base de dados!'.format(numerodoc))
-#         else:
-#             messages.error(request, 'O lojista do documento ainda não se encontra na nossa base de dados!')
-#     else:
-#         user = get_object_or_404(User, id=id)
-#         documentoFiscal_form = UserAddFiscalDocForm()
-#     return render(request, 'participante/doc_fiscal_add_op.html', {'documentoFiscal_form': documentoFiscal_form, 'participante': user})
+
 
 @login_required
 def doclist(request):

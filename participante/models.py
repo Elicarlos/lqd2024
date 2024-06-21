@@ -122,19 +122,7 @@ class DocumentoFiscal(models.Model):
     def get_absolute_url_byop(self):
         return reverse('participante:editdocfiscalbyop', args=[self.id])
 
-    # def get_cupons(self):
-    #     cupons = 0
-    #     if self.valorDocumento > 49.99:
-    #         if self.compradoMASTERCARD and self.compradoREDE :
-    #             self.valorVirtual = self.valorDocumento * 5
-    #         elif self.compradoREDE:
-    #             self.valorVirtual = self.valorDocumento * 3
-    #         else:
-    #             self.valorVirtual = self.valorDocumento
 
-    #         cupons = self.valorVirtual // 50
-
-    #     return cupons
 
     def get_cupons(self):
         cupons = 0

@@ -198,16 +198,24 @@
 				<a style="color: #FBB65C" href="{% url 'lojista:homepage' %}">{{ request.user.username }} <span style="color: #30C778" class="glyphicon glyphicon-log-in"> </span></a>
 			</li id="entrar">
 			<li>
-				<a href="{% url "participante:logout" %}">Sair</a>
+				<form id="logout-form" method="post" action="{% url 'participante:logout' %}" style="display: none;">
+					{% csrf_token %}
+					<button type="submit">Sair</button>
+				</form>
+				<a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a>
 			</li>
-
+			
 			{% elif user.is_authenticated %}
 			<li style="color: #FBB65C">
-				<a  href="{% url 'participante:dashboard' %}">{{ request.user.username }} <span style="color: #30C778" class="glyphicon glyphicon-user"></span></a>
+				<a href="{% url 'participante:dashboard' %}">{{ request.user.username }} <span style="color: #30C778" class="glyphicon glyphicon-user"></span></a>
 			</li id="entrar">
-
+			
 			<li>
-				<a href="{% url "participante:logout" %}">Sair</a>
+				<form id="logout-form" method="post" action="{% url 'participante:logout' %}" style="display: none;">
+					{% csrf_token %}
+					<button type="submit">Sair</button>
+				</form>
+				<a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a>
 			</li>
 			{% else %}
 			<li>

@@ -20,6 +20,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('', include(purls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('op-admin-nimda-solu/', admin.site.urls),
     re_path(r'^cupom/', include(curls, namespace='cupom')),
     path('lojista/', include(lurls, namespace='lojista')),
@@ -27,7 +28,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/participante/v1/', include('participante.api.v1.urls')),
-    # path('api/lojista/v1/', include('lojista.api.v1.urls')),
+    
     # python-social-auth
     #url('social-auth/', include('social.apps.django_app.urls', namespace='social')),
 ]

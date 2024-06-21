@@ -27,7 +27,6 @@ a.css(d.property,f-b+"px"))})});m.each(function(){var a=c(this);a.attr("style",a
 this.options)});b._afterUpdate&&b._afterUpdate(a,b._groups)};b._update=function(a,e){if(e&&"resize"===e.type){var d=c(window).width();if(d===n)return;n=d}a?-1===f&&(f=setTimeout(function(){q(e);f=-1},b._throttle)):q(e)};c(b._applyDataApi);c(window).bind("load",function(a){b._update(!1,a)});c(window).bind("resize orientationchange",function(a){b._update(!0,a)})})(jQuery);
 
 
-
 (function($) {
     "use strict"; // Start of use strict
 
@@ -51,8 +50,6 @@ this.options)});b._afterUpdate&&b._afterUpdate(a,b._groups)};b._update=function(
         $('.navbar-toggle:visible').click();
     });
 
-
-
     // Offset for Main Navigation
     $('#mainNav').affix({
         offset: {
@@ -63,63 +60,65 @@ this.options)});b._afterUpdate&&b._afterUpdate(a,b._groups)};b._update=function(
     // Initialize WOW.js Scrolling Animations
     new WOW().init();
 
+    /* Carousel */
+    (function( $ ) {
+        // Function to animate slider captions
+        function doAnimations(elems) {
+            // Cache the animationend event in a variable
+            var animEndEv = 'webkitAnimationEnd animationend';
 
+            elems.each(function() {
+                var $this = $(this),
+                    $animationType = $this.data('animation');
+                $this.addClass($animationType).one(animEndEv, function() {
+                    $this.removeClass($animationType);
+                });
+            });
+        }
 
-/* Carousel
-*/
-(function( $ ) {
+        // Variables on page load
+        var $myCarousel = $('#carousel-example-generic'),
+            $firstAnimatingElems = $myCarousel.find('.item:first').find("[data-animation ^= 'animated']");
 
-	//Function to animate slider captions
-	function doAnimations( elems ) {
-		//Cache the animationend event in a variable
-		var animEndEv = 'webkitAnimationEnd animationend';
+        // Initialize carousel
+        $myCarousel.carousel();
 
-		elems.each(function () {
-			var $this = $(this),
-				$animationType = $this.data('animation');
-			$this.addClass($animationType).one(animEndEv, function () {
-				$this.removeClass($animationType);
-			});
-		});
-	}
+        // Animate captions in first slide on page load
+        doAnimations($firstAnimatingElems);
 
-	//Variables on page load
-	var $myCarousel = $('#carousel-example-generic'),
-		$firstAnimatingElems = $myCarousel.find('.item:first').find("[data-animation ^= 'animated']");
+        // Pause carousel
+        $myCarousel.carousel('pause');
 
-	//Initialize carousel
-	$myCarousel.carousel();
+        // Other slides to be animated on carousel slide event
+        $myCarousel.on('slide.bs.carousel', function(e) {
+            var $animatingElems = $(e.relatedTarget).find("[data-animation ^= 'animated']");
+            doAnimations($animatingElems);
+        });
 
-	//Animate captions in first slide on page load
-	doAnimations($firstAnimatingElems);
+    })(jQuery);
 
-	//Pause carousel
-	$myCarousel.carousel('pause');
-
-
-	//Other slides to be animated on carousel slide event
-	$myCarousel.on('slide.bs.carousel', function (e) {
-		var $animatingElems = $(e.relatedTarget).find("[data-animation ^= 'animated']");
-		doAnimations($animatingElems);
-	});
-
-})(jQuery);
-
-
-// =============================================
-// Match Height
-// =============================================
-$('.equal-heights .col-md-4').matchHeight();
-
+    // Match Height
+    $('.equal-heights .col-md-4').matchHeight();
 
 })(jQuery); // End of use strict
 
-var angle = 0, img = document.getElementById('imgdoc');
-document.getElementById('button').onclick = function() {
-    angle = (angle+90)%360;
-    img.className = "rotate"+angle;
-}
+// JavaScript specific code
+document.addEventListener('DOMContentLoaded', function () {
+    var angle = 0;
+    var img = document.getElementById('imgdoc');
+    var button = document.getElementById('button');
 
-$('img.sample-image').click(function() {
-  $(this).toggleClass( "sample-image-large" );
+    if (button && img) {
+        button.onclick = function() {
+            angle = (angle + 90) % 360;
+            img.className = "rotate" + angle;
+        };
+    }
+
+    var sampleImages = document.querySelectorAll('img.sample-image');
+    sampleImages.forEach(function(image) {
+        image.addEventListener('click', function() {
+            image.classList.toggle("sample-image-large");
+        });
+    });
 });

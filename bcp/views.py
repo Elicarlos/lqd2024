@@ -1,4 +1,5 @@
 from cupom.models import Cupom
+from django.db import transaction
 from participante.models import DocumentoFiscal, Profile
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -9,6 +10,18 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from participante.forms import DocumentoFiscalEditForm
 from cryptography.fernet import Fernet
+
+from reportlab.graphics.shapes import String, Drawing
+from reportlab.pdfgen import canvas
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode import qr
+from reportlab.pdfbase import pdfdoc
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
+from django.utils.dateformat import DateFormat
+from datetime import datetime
+
 # from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.templatetags.static import static
 try:
@@ -54,6 +67,7 @@ def print_qrcode(request, id_, template='print.html'):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
+@transaction.atomic
 def print_barcode(request, id_, template='print.html'):
     """
     This page causes the browser to request the barcode be printed
@@ -63,7 +77,7 @@ def print_barcode(request, id_, template='print.html'):
     new_doc = doc_form.save(commit=False)
     new_doc.status = False
     new_doc.save()
-    doc = get_object_or_404(DocumentoFiscal, id=id_)
+    # doc = get_object_or_404(DocumentoFiscal, id=id_)
     pdf_url = reverse('bcp:generate', kwargs = {'id_': id_,})
     context = { 'pdf_url': pdf_url, 'doc':doc }
     return render(request, template, context)
@@ -72,19 +86,9 @@ def print_barcode(request, id_, template='print.html'):
 @user_passes_test(lambda u: u.is_superuser)
 def generate(request, id_,  barcode_type='Standard39', auto_print=True):
     """
-     Returns a PDF Barcode using ReportLab
-    """
+     Returns a PDF Barcode using ReportLab """
 
-    from reportlab.graphics.shapes import String, Drawing
-    from reportlab.pdfgen import canvas
-    from reportlab.graphics import renderPDF
-    from reportlab.graphics.barcode import qr
-    from reportlab.pdfbase import pdfdoc
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.utils import ImageReader
-    from django.utils.dateformat import DateFormat
-    from datetime import datetime
+    
 
 
     response = HttpResponse(content_type='application/pdf')

@@ -115,8 +115,13 @@
 
         {% if request.user.is_authenticated %}
         <li class="page-scroll">
-            <a href="{% url 'participante:logout' %}">Sair</a>
-        </li>      
+            <form id="logout-form" method="post" action="{% url 'participante:logout' %}" style="display: none;">
+                {% csrf_token %}
+                <button type="submit">Sair</button>
+            </form>
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a>
+        </li>
+             
 
         {% else %}
         {% comment %} <li class="page-scroll">
