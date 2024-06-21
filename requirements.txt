@@ -25,7 +25,8 @@ django-parsley==0.7
 django-storages==1.13.2
 django-widget-tweaks==1.4.12
 docutils==0.20.1
-djangorestframework==3.12.4  # Especificar a versão compatível com Django 3.2.20
+djangorestframework==3.12.4
+djangorestframework-simplejwt==5.2.2  # Adicione esta linha
 et-xmlfile==1.1.0
 gunicorn==21.2.0
 idna==3.4
