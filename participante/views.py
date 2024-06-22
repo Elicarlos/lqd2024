@@ -482,7 +482,12 @@ def validadocfiscal(request, id):
             new_doc.save()
             if not new_doc.pendente:
                 for x in range(new_doc.qtde):
-                    Cupom.objects.create(documentoFiscal=new_doc, user=new_doc.user, operador=request.user, posto_trabalho=request.user.profile.posto_trabalho)
+                    Cupom.objects.create(
+                        documentoFiscal=new_doc, 
+                        user=new_doc.user, 
+                        operador=request.user, 
+                        posto_trabalho=request.user.profile.posto_trabalho
+                    )
             messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
             return redirect('participante:user_detail', id=profile.user.id)  # redirecionar para a página de detalhe
         elif documentofiscal_form.is_valid() and pendente:
