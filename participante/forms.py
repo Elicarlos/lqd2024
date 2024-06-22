@@ -156,7 +156,7 @@ class UserAddFiscalDocForm(forms.ModelForm):
         lojista_cnpj = self.cleaned_data.get('lojista_cnpj')
         lojista = Lojista.objects.get(CNPJLojista=lojista_cnpj)
         if numeroDocumento and DocumentoFiscal.objects.filter(lojista=lojista, numeroDocumento=numeroDocumento).exists():
-            raise forms.ValidationError(u'Um documento com este número já foi lançado para esse participante!')
+            raise forms.ValidationError(u'Este documento fiscal já foi cadastrado para este lojista!')
         return numeroDocumento
 
 class UserAddFiscalDocFormSuperuser(UserAddFiscalDocForm):
