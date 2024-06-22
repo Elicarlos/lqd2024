@@ -18,7 +18,6 @@ urlpatterns = [
 
     path('logout/', LogoutView.as_view(next_page='participante:homepage'), name='logout'),
 
-
     #Relatorios
   
     path('dados_campanha/', views.dados_campanha, name="dados_campanha"),
@@ -47,10 +46,8 @@ urlpatterns = [
     # Coupons paths
     path('coupons/', views.coupons, name='coupons'),
 
-
     # Premios paths
     path('premios/', views.premios, name='premios'),
-
 
     # path('cadastrar/', views.register, name='register'),
     # Removido final de campanha

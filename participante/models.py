@@ -112,7 +112,7 @@ class DocumentoFiscal(models.Model):
         verbose_name = (u'Documento Fiscal')
         verbose_name_plural = (u'Documentos Fiscais')
         constraints = [
-            models.UniqueConstraint(fields=['user', 'numeroDocumento', 'lojista'], name='unique_user_numeroDocumento_lojista')
+            models.UniqueConstraint(fields=['numeroDocumento', 'lojista'], name='unique_user_numeroDocumento_lojista')
         ]
         
 

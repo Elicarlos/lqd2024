@@ -65,6 +65,7 @@ INSTALLED_APPS = (
     'parsley',
     'anymail',
     'rest_framework',
+    'django_session_timeout'
     
   
     
@@ -82,6 +83,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
     
   
    
@@ -92,6 +94,10 @@ MIDDLEWARE = [
 #     "https://seu-frontend-em-nextjs.com",  # Substitua pelo domínio do seu frontend
 # ]
 
+
+SESSION_EXPIRE_SECONDS = 1800
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_TIMEOUT_REDIRECT = '/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
