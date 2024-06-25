@@ -94,7 +94,9 @@ urlpatterns = [
 
     path('consulta-cep/', consulta_cep, name='consulta_cep'),
     
-    path('definir_posto/', views.definir_posto, name='definir_posto')
+    path('definir_posto/', views.definir_posto, name='definir_posto'),
+    # Adicionando a URL para a view de confirmação
+    path('doc_fiscal_done/<int:doc_id>/', views.doc_fiscal_done, name='doc_fiscal_done'),
 
     #TICKET
     # path('gerarticket/', views.gerarticket, name='gerarticket'),

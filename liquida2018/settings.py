@@ -65,7 +65,9 @@ INSTALLED_APPS = (
     'parsley',
     'anymail',
     'rest_framework',
-    'django_session_timeout'
+    'django_session_timeout',
+    'django_celery_results',
+    'silk',
     
   
     
@@ -84,6 +86,7 @@ MIDDLEWARE = [
     
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
+    'silk.middleware.SilkyMiddleware',
     
   
    
@@ -146,7 +149,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'lqd2023',
+#         'NAME': 'lqd2024',
 #         'USER': 'postgres',
 #         'PASSWORD': 'postgres',
 #         'HOST': 'localhost',
@@ -249,6 +252,16 @@ ABSOLUTE_URL_OVERRIDES = {
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+
+
+
+
 
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
@@ -306,15 +319,32 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'celery_tasks.log',
+            'formatter': 'verbose',
         }
     },
     'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         'testlogger': {
             'handlers': ['console'],
             'level': 'INFO',
-        }
+        },
+        'celery': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }
+
+
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
 

@@ -48,14 +48,21 @@ def main_page(request):
     login_form = LoginForm()
     return render(request, 'participante/coming_soon.html', {'section': 'homepage', 'lf': login_form})
 
+@login_required
+def doc_fiscal_done(request, doc_id):
+    documentoFiscal = get_object_or_404(DocumentoFiscal, id=doc_id)
+    return render(request, 'participante/doc_fiscal_done.html', {'new_documentoFiscal': documentoFiscal})
+
 #backoffice
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def backoffice(request):
-    docs_list = DocumentoFiscal.objects.filter(pendente=True).order_by('-dataCadastro')
-    docs_list = Paginator(docs_list, 100)
-    page = docs_list.page(request.GET.get('page', '1'))
-    return render(request, 'participante/participante_backoffice.html', {'section': 'backoffice', 'docs': page})
+    docs_list = DocumentoFiscal.objects.filter(pendente=True, enviado_por_operador=False).order_by('-dataCadastro')
+    paginator = Paginator(docs_list, 100)
+    page = request.GET.get('page', 1)
+    docs = paginator.get_page(page)
+    return render(request, 'participante/participante_backoffice.html', {'section': 'backoffice', 'docs': docs})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -334,38 +341,37 @@ def user_edit(request, id):
         profile_form = ProfileEditForm(instance=instance_profile)
     return render(request, 'participante/editbyoperador.html', {'profile_form': profile_form})
 
+
 @login_required
 @transaction.atomic
 def adddocfiscal(request):
+    print('add documento fiscal')
     if request.method == 'POST':
-        documentoFiscal_form = UserAddFiscalDocForm(request.POST,
-                                                    files=request.FILES)
-        cnpj = documentoFiscal_form['lojista_cnpj'].value()              
-
-        try:
-            lojista = Lojista.objects.get(CNPJLojista=cnpj)
-            user = request.user
-            if lojista:
-                if documentoFiscal_form.is_valid():
-                    # Create a new document object but avoid saving it yet
-                    new_documentoFiscal = documentoFiscal_form.save(commit=False)
-                    # Set the user
-                    new_documentoFiscal.user = user
-                    new_documentoFiscal.lojista = lojista
-                    new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
-                    # Save the doc object
-                    new_documentoFiscal.save()
-                    messages.success(request, 'Documento adicionado com sucesso!')
-                    return render(request,
-                                  'participante/doc_fiscal_done.html',
-                                  {'new_documentoFiscal': new_documentoFiscal})
-        except Lojista.DoesNotExist:
-            messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'>     <b> |Informar ao Suporte|</b></a>")
-            documentoFiscal_form = UserAddFiscalDocForm()
-            return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
+        documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
+        
+        if documentoFiscal_form.is_valid():
+            cnpj = documentoFiscal_form.cleaned_data['lojista_cnpj']
+            
+            try:
+                lojista = Lojista.objects.get(CNPJLojista=cnpj)
+                new_documentoFiscal = documentoFiscal_form.save(commit=False)
+                new_documentoFiscal.user = request.user
+                new_documentoFiscal.lojista = lojista
+                new_documentoFiscal.valorDocumento = documentoFiscal_form.cleaned_data.get('valorDocumento')
+                new_documentoFiscal.save()
+                
+                messages.success(request, 'Documento adicionado com sucesso!')
+                return redirect('participante:dashboard')
+            
+            except Lojista.DoesNotExist:
+                messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
+    
     else:
         documentoFiscal_form = UserAddFiscalDocForm()
+    
     return render(request, 'participante/doc_fiscal_add.html', {'documentoFiscal_form': documentoFiscal_form})
+
+
 
 
 @login_required
@@ -438,6 +444,7 @@ def editdocfiscal(request, id):
             new_doc.observacao = "Nenhuma"
             new_doc.save()
             messages.success(request, 'Documento Fiscal atualizado com sucesso!')
+            return redirect('participante:dashboard')
         else:
             messages.error(request, 'Erro na atualização do documento Fiscal! verifique se não há algum dado incoerênte no formulario')
     else:
@@ -468,38 +475,37 @@ def editdocfiscalbyop(request, id):
 @user_passes_test(lambda u: u.is_superuser)
 @transaction.atomic
 def validadocfiscal(request, id):
+    instance = get_object_or_404(DocumentoFiscal, id=id)
     if request.method == 'POST':
-        instance = get_object_or_404(DocumentoFiscal, id=id)
         documentofiscal_form = DocumentoFiscalValidaForm(instance=instance, data=request.POST, files=request.FILES)
-        profile = get_object_or_404(Profile, user=instance.user)
-        docs = DocumentoFiscal.objects.filter(user=instance.user)
-        pendente = documentofiscal_form['pendente'].value()
-        if documentofiscal_form.is_valid() and not pendente:
+        if documentofiscal_form.is_valid():
             new_doc = documentofiscal_form.save(commit=False)
             new_doc.qtde = int(new_doc.get_cupons())
-            new_doc.status = True
+            new_doc.status = not new_doc.pendente
             new_doc.posto_trabalho = request.user.profile.posto_trabalho
             new_doc.save()
+
             if not new_doc.pendente:
-                for x in range(new_doc.qtde):
-                    Cupom.objects.create(
-                        documentoFiscal=new_doc, 
-                        user=new_doc.user, 
-                        operador=request.user, 
+                cupons = [
+                    Cupom(
+                        documentoFiscal=new_doc,
+                        user=new_doc.user,
+                        operador=request.user,
                         posto_trabalho=request.user.profile.posto_trabalho
-                    )
-            messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
-            return redirect('participante:user_detail', id=profile.user.id)  # redirecionar para a página de detalhe
-        elif documentofiscal_form.is_valid() and pendente:
-            new_doc = documentofiscal_form.save(commit=False)
-            new_doc.save()
-            messages.info(request, 'O documento fiscal {} não foi validado por pendencias. Se está tudo certo com o documento, por favor repita novamente o procedimento de validação e desmarque a opção de pendente para que o mesmo seja validado! Se você encontrou pendêcias no documento em questão por favor não esqueça de descriminar a pendência no campo obsevações!'.format(new_doc.numeroDocumento))
-            return redirect('participante:user_detail', id=profile.user.id)  # redirecionar para a página de detalhe
-        else:
-            messages.error(request, 'Ocorreu um erro durante o processo de validação verifique se não há algum dado incoerênte no formulario!')
+                    ) for _ in range(new_doc.qtde)
+                ]
+                Cupom.objects.bulk_create(cupons)
+                messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
+            else:
+                messages.info(request, f'O documento fiscal {new_doc.numeroDocumento} não foi validado por pendências. Se está tudo certo com o documento, por favor repita novamente o procedimento de validação e desmarque a opção de pendente para que o mesmo seja validado! Se você encontrou pendências no documento em questão, por favor não esqueça de descrevê-las no campo observações!')
+
+            return redirect('participante:user_detail', id=new_doc.user.id)
+
+        messages.error(request, 'Ocorreu um erro durante o processo de validação. Verifique se não há algum dado incoerente no formulário!')
+
     else:
-        instance = get_object_or_404(DocumentoFiscal, id=id)
         documentofiscal_form = DocumentoFiscalValidaForm(instance=instance)
+
     return render(request, 'participante/doc_fiscal_valida.html', {'documentofiscal_form': documentofiscal_form, 'doc': instance})
 
 
@@ -640,7 +646,7 @@ def dados_campanha(request):
     else:
         ticket_medio = float(faturamento_total / quant_documentos) 
 
-    print(quant_usuario)
+   
 
     context = {
         'labels': labels,
@@ -752,7 +758,7 @@ def graficos(request):
 
     
     
-    print(operadores_info)
+    
     
 
     context = {        

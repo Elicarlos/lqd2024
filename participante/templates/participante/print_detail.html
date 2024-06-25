@@ -61,7 +61,7 @@
                   {% if not doc.pendente %}
                   <strong style="color:lightgreen">Validado</strong>
                   {% else %}
-                  <a data-toggle="modal" href="{% url "participante:validadocfiscal" doc.id %}" class="btn btn-primary a-btn-slide-text btn-sm">
+                  <a data-toggle="modal" href="{% url 'participante:validadocfiscal' doc.id %}" class="btn btn-primary a-btn-slide-text btn-sm">
                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                     <span><strong>Validar</strong></span> </a>
                   {% endif %}
@@ -75,7 +75,7 @@
                       <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
                       <span><strong>Imprimir</strong></span> </a>
                   {% else %}
-                  <a href="{% url "bcp:print" doc.id %}" class="btn btn-primary a-btn-slide-text btn-sm">
+                  <a href="{% url 'bcp:print' doc.id %}" class="btn btn-primary a-btn-slide-text btn-sm">
                     <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
                     <span><strong>Imprimir</strong></span> </a>
                   {% endif %}

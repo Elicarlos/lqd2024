@@ -15,7 +15,7 @@ from django.core.exceptions import ValidationError
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Digite seu usuario', 'class':'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Digite sua senha', 'class':'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Digite sua senha', 'class':'form-control custom-input'}))
 
 
 class UserRegistrationForm(forms.ModelForm):

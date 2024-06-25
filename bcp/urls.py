@@ -21,6 +21,5 @@ urlpatterns = [
     re_path(r'^(?P<id_>[-\w]+)/test', views.print_barcode_embed_example, name='embed-example'),
     # path('regulamento/', views.regulamento, name='regulamento'),
 ]
-
 # handler404 = 'participante.views.not_found_page_view'
 # handler500 = 'participante.views.server_error_view'

@@ -1,98 +1,33 @@
-from bcp.tasks import generate_pdf_task
+from celery import shared_task
+from django.core.mail import send_mail
 from cupom.models import Cupom
-from django.db import transaction
 from participante.models import DocumentoFiscal, Profile
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
-from django.urls import reverse
-from django.shortcuts import render
-from django.shortcuts import render, redirect, get_object_or_404
-from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
-from participante.forms import DocumentoFiscalEditForm
-from cryptography.fernet import Fernet
-
-from reportlab.graphics.shapes import String, Drawing
+from django.db import transaction
+from django.contrib.auth.models import User
+from datetime import datetime
+from django.shortcuts import get_object_or_404
 from reportlab.pdfgen import canvas
-from reportlab.graphics import renderPDF
-from reportlab.graphics.barcode import qr
-from reportlab.pdfbase import pdfdoc
+from io import BytesIO
+from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics import renderPDF
 from django.utils.dateformat import DateFormat
-from datetime import datetime
-from silk.profiling.profiler import silk_profile
-from celery.result import AsyncResult
-from django.http import JsonResponse
+from reportlab.graphics.barcode import qr
+from base64 import b64encode
+import logging
+import bcp.settings as bcp_settings
 
-# from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.templatetags.static import static
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO
 
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def print_barcode_embed_example(request, id_, template='cupons_impressos.html'):
-    """
-    This is a test page showing how you can embed a request to print a barcode
-    """
-    doc = get_object_or_404(DocumentoFiscal, id=id_)
-    if not doc.status and not request.user.is_staff:
-        return render(request, 'lojista/dashboard.html')
-    doc_form = DocumentoFiscalEditForm(instance=doc)
-    new_doc = doc_form.save(commit=False)
-    new_doc.key = Fernet.generate_key()
-    new_doc.status = False
-    new_doc.save()
-    bcp_url = reverse('bcp:print_qrcode', kwargs = {'id_': id_,})
-    context = { 'bcp_url': bcp_url, 'doc':doc, }
-    return render(request, template, context)
+@shared_task
+def somar(x, y):
+    return x + y
+    
 
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def print_qrcode(request, id_, template='print.html'):
-    """
-    This page causes the browser to request the barcode be printed
-    """
-    doc = get_object_or_404(DocumentoFiscal, id=id_)
-    doc_form = DocumentoFiscalEditForm(instance=doc)
-    new_doc = doc_form.save(commit=False)
-    new_doc.status = False
-    new_doc.save()
-    pdf_url = reverse('bcp:generate', kwargs = {'id_': id_, })
-    context = { 'pdf_url': pdf_url, }
-    return render(request, template, context)
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-@transaction.atomic
-def print_barcode(request, id_, template='print.html'):
-    """
-    This page causes the browser to request the barcode be printed
-    """
-    doc = get_object_or_404(DocumentoFiscal, id=id_)
-    doc_form = DocumentoFiscalEditForm(instance=doc)
-    new_doc = doc_form.save(commit=False)
-    new_doc.status = False
-    new_doc.save()
-    # doc = get_object_or_404(DocumentoFiscal, id=id_)
-    pdf_url = reverse('bcp:generate', kwargs = {'id_': id_,})
-    context = { 'pdf_url': pdf_url, 'doc':doc }
-    return render(request, template, context)
-        
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-@silk_profile(name='Generate PDF')
-def generate(request, id_, barcode_type='Standard39', auto_print=True):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename={id_}.pdf'
-
-    # Configurações
-    import bcp.settings as bcp_settings
+@shared_task
+def generate_pdf_task(doc_id):
+    
     font_size = bcp_settings.FONT_SIZE
     bar_height = bcp_settings.BAR_HEIGHT
     bar_width = bcp_settings.BAR_WIDTH
@@ -105,21 +40,12 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     image_master = bcp_settings.IMAGE_MASTER
     image_cdl = bcp_settings.IMAGE_CDL
 
-    doc = get_object_or_404(DocumentoFiscal, id=id_)
-  
-    doc = get_object_or_404(DocumentoFiscal.objects.select_related('user__profile'), id=id_)
-    cupons = Cupom.objects.filter(documentoFiscal=doc).select_related('documentoFiscal').prefetch_related('documentoFiscal__user')
+    doc = DocumentoFiscal.objects.select_related('user__profile').get(id=doc_id)
+    cupons = Cupom.objects.filter(documentoFiscal=doc).select_related('documentoFiscal', 'documentoFiscal__user')
     profile = doc.user.profile
 
-
-    # Registro da fonte
     pdfmetrics.registerFont(TTFont(font_name, font_path))
     pdfmetrics.registerFont(TTFont(font_name_bold, font_bold))
-
-    # Configurar JS para impressão automática
-    if auto_print:
-        pdfdoc.PDFCatalog.OpenAction = '<</S/JavaScript/JS(this.print({bUI:false,bSilent:true,bShrinkToFit:true}));>>'
-        pdfdoc.PDFInfo.title = 'Liquida Teresina 2024'
 
     buffer = BytesIO()
     c = canvas.Canvas(buffer)
@@ -201,6 +127,4 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     pdf = buffer.getvalue()
     buffer.close()
 
-    response.write(pdf)
-    return response
-
+    return b64encode(pdf).decode('utf-8')
