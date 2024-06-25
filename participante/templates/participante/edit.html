@@ -14,4 +14,37 @@
         <p><input type="submit" class="btn btn-primary btn-lg" value="Salvar Alterações">
         <a type="button" class="btn" href="{% url 'participante:dashboard' %}">Cancelar</button></p>
     </form>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector('.cep').addEventListener('blur', function() {
+        var cep = this.value.replace(/\D/g, '');
+
+        if (cep != "") {
+            var validacep = /^[0-9]{8}$/;
+
+            if(validacep.test(cep)) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            document.querySelector('#id_endereco').value = data.logradouro;
+                            document.querySelector('#id_bairro').value = data.bairro;
+                            document.querySelector('#id_cidade').value = data.localidade;
+                            // document.querySelector('#id_estados').value = data.uf;
+                        } else {
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar o CEP:', error);
+                        alert("Erro ao buscar o CEP.");
+                    });
+            } else {
+                alert("Formato de CEP inválido.");
+            }
+        }
+    });
+});
+
+    </script>
 {% endblock %}

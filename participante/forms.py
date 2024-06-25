@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Digite seu usuario', 'class':'form-control'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Digite seu usuario', 'class':'form-control custom-input'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Digite sua senha', 'class':'form-control custom-input'}))
 
 
@@ -22,8 +22,8 @@ class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Senha* (mínimo de 8 caracteres)', 'class': 'custom-input'}))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'placeholder':'Confirmação de senha*', 'class': 'custom-input'}))
     username = BRCPFField(required=True, max_length=14, min_length=11, widget=forms.TextInput(attrs={'placeholder':'CPF*', 'autocomplete':'off',
-                                                                                                'class':'cpf', 'cpf':'id_CPF'}))
-    email = forms.EmailField(required=True, widget=forms.TextInput(attrs={'placeholder':'Email*', 'autocomplete':'off'}))
+                                                                                                'class':'custom-input cpf', 'cpf':'id_CPF'}))
+    email = forms.EmailField(required=True, widget=forms.TextInput(attrs={'placeholder':'Email*', 'autocomplete':'off', 'class': 'custom-input'}))
     class Meta:
         model = User
         fields = ('username', 'email')
@@ -57,27 +57,27 @@ class ProfileRegistrationForm(forms.ModelForm):
               ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'), ('RS', 'Rio Grande do Sul'),
               ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'),
               ('TO', 'Tocantins'))
-    sexo = forms.ChoiceField(choices=CHOICES_SEXO, widget=forms.Select(attrs={'id' : 'sexo'}))
+    sexo = forms.ChoiceField(choices=CHOICES_SEXO, widget=forms.Select(attrs={'id' : 'sexo', 'class': 'custom-input'}))
     estado = forms.ChoiceField(required=True, choices=STATE_CHOICES, widget=forms.Select(attrs={'id' : 'estados'}))
     pergunta = forms.CharField(required=True,widget=forms.TextInput(attrs={'placeholder':'Sua resposta', 'autocomplete':'off'}))
-    nome = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Nome Completo*', 'autocomplete':'off'}))
-    RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*', 'autocomplete':'off'}))
+    nome = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Nome Completo*', 'autocomplete':'off', 'class': 'custom-input'}))
+    RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*', 'autocomplete':'off', 'class': 'custom-input' }))
     CPF = BRCPFField(required=False, max_length=14, min_length=11, widget=forms.TextInput(attrs={'placeholder':'CPF*',
-                                                                                                'class':'cpf', 'type':'hidden'}))
+                                                                                                'class':'custom-input cpf', 'type':'hidden'}))
     foneCelular1 = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Celular*',
-                                                                                  'class': 'phone_with_ddd', 'autocomplete':'off'}))
+                                                                                  'class': 'custom-input phone_with_ddd', 'autocomplete':'off'}))
     whatsapp = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Whatsapp',
-                                                                                  'class': 'phone_with_ddd', 'autocomplete':'off'}))
+                                                                                  'class': 'custom-input phone_with_ddd', 'autocomplete':'off'}))
     facebook = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Facebook', 'autocomplete':'off'}))
     twitter = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Twitter', 'autocomplete':'off'}) )
-    endereco = forms.CharField( required=True, widget=forms.TextInput(attrs={'placeholder':'Endereço*', 'autocomplete':'off'}))
-    enderecoNumero = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Nº da casa', 'autocomplete':'off'}))
-    enderecoComplemento = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Complemento', 'autocomplete':'off'}))
-    bairro = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Bairro*', 'autocomplete':'off'}))
-    cidade = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Cidade*', 'autocomplete':'off'}))
-    estado = forms.ChoiceField(required=True, choices=CHOICES_STATES, widget=forms.Select(attrs={'id' : 'estados'}))
+    endereco = forms.CharField( required=True, widget=forms.TextInput(attrs={'placeholder':'Endereço*', 'autocomplete':'off', 'class': 'custom-input', 'id': 'id_endereco'}))
+    enderecoNumero = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Nº da casa', 'autocomplete':'off', 'class': 'custom-input'}))
+    enderecoComplemento = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Complemento', 'autocomplete':'off', 'class': 'custom-input'}))
+    bairro = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Bairro*', 'autocomplete':'off', 'class': 'custom-input', 'id': 'id_bairro'}))
+    cidade = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Cidade*', 'autocomplete':'off', 'class': 'custom-input', 'id': 'id_cidade'}))
+    estado = forms.ChoiceField(required=True, choices=CHOICES_STATES, widget=forms.Select(attrs={'id' : 'estados', 'class': 'custom-input'}))
     # estado = forms.ChoiceField(required=True, widget=forms.TextInput(attrs={'placeholder':'Estado*', 'autocomplete':'off'}))
-    CEP = BRZipCodeField(required=False, label='Cep*' , widget=forms.TextInput(attrs={'class':'cep', 'placeholder':'CEP*', 'autocomplete':'off'}))
+    CEP = BRZipCodeField(required=False, label='Cep*' , widget=forms.TextInput(attrs={'class':'custom-input cep', 'placeholder':'CEP*', 'autocomplete':'off'}))
     pergunta = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Liquida Teresina'}))
 
     class Meta:
@@ -129,11 +129,11 @@ class UserAddCoupom(forms.ModelForm):
 
 
 class UserAddFiscalDocForm(forms.ModelForm):
-    lojista_cnpj = BRCNPJField(label='CNPJ da loja*', required=True, max_length=18, widget=forms.TextInput(attrs={'class':'cnpj', 'autocomplete':'off'}))
-    dataDocumento = forms.DateField(label='Data*',widget=forms.TextInput(attrs={ 'class':'date', 'autocomplete':'off'}))
-    valorDocumento = forms.DecimalField(max_digits=8, decimal_places=2, localize=True, label='Valor*', widget=forms.TextInput(attrs={'autocomplete':'off', 'id': 'id_add_doc'}))
+    lojista_cnpj = BRCNPJField(label='CNPJ da loja*', required=True, max_length=18, widget=forms.TextInput(attrs={'class':'custom-input cnpj', 'autocomplete':'off'}))
+    dataDocumento = forms.DateField(label='Data*',widget=forms.TextInput(attrs={ 'class':'custom-input date', 'autocomplete':'off'}))
+    valorDocumento = forms.DecimalField(max_digits=8, decimal_places=2, localize=True, label='Valor*', widget=forms.TextInput(attrs={'autocomplete':'off','class': 'custom-input', 'id': 'id_add_doc'}))
     # valorDocumento = forms.CharField(label='Valor*', widget=forms.TextInput(attrs={'autocomplete':'off'}))
-    numeroDocumento = forms.CharField(label='Número do documento*', widget=forms.TextInput(attrs={ 'autocomplete':'off'}))
+    numeroDocumento = forms.CharField(label='Número do documento*', widget=forms.TextInput(attrs={ 'autocomplete':'off', 'class': 'custom-input'}))
     photo = forms.FileField(label='Documento fiscal', required=True)
     photo2 = forms.FileField(label='Comprovante do cartão', required=False)
     class Meta:
@@ -202,11 +202,11 @@ class ProfileEditForm(forms.ModelForm):
                                                                                   'class': 'phone_with_ddd'}))
     facebook = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Facebook'}))
     twitter = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Twitter'}) )
-    endereco = forms.CharField( required=True, widget=forms.TextInput(attrs={'placeholder':'Endereço*'}))
+    endereco = forms.CharField( required=True, widget=forms.TextInput(attrs={'placeholder':'Endereço*', 'id': 'id_endereco'}))
     enderecoNumero = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Nº da casa'}))
     enderecoComplemento = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Complemento'}))
-    bairro = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Bairro*'}))
-    cidade = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Cidade*'}))
+    bairro = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Bairro*', 'id': 'id_bairro'}))
+    cidade = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Cidade*', 'id': 'id_cidade'}))
     estado = forms.ChoiceField(required=True, choices=STATE_CHOICES, widget=forms.Select(attrs={'id' : 'estados'}))
     CEP = BRZipCodeField(required=False, label='Cep*' , widget=forms.TextInput(attrs={'class':'cep', 'placeholder':'CEP*'}))
     pergunta = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Liquida Teresina'}))
