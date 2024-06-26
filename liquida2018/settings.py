@@ -319,31 +319,15 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'celery_tasks.log',
-            'formatter': 'verbose',
         }
     },
     'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
         'testlogger': {
             'handlers': ['console'],
             'level': 'INFO',
-        },
-        'celery': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
+        }
     }
 }
-
 
 
 DEBUG_PROPAGATE_EXCEPTIONS = True
