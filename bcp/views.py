@@ -101,8 +101,8 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     font_bold = bcp_settings.FONT_PATH_BOLD
     font_name_bold = bcp_settings.FONT_BOLD
     image_path = bcp_settings.IMAGE_PATH
-    image_rede = bcp_settings.IMAGE_REDE
-    image_master = bcp_settings.IMAGE_MASTER
+    image_pagbank = bcp_settings.IMAGE_PAGBANK
+    image_master = bcp_settings.IMAGE_ELO
     image_cdl = bcp_settings.IMAGE_CDL
 
     doc = get_object_or_404(DocumentoFiscal, id=id_)
@@ -126,7 +126,7 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
 
     def draw_fixed_elements():
         c.drawImage(image_path, 210, 685, mask='auto')
-        c.drawImage(image_rede, 35, 688, mask='auto')
+        c.drawImage(image_pagbank, 20, 688, mask='auto')
         c.drawImage(image_master, 400, 688, mask='auto')
         c.drawImage(image_cdl, 70, 90, mask='auto')
         c.setFont(font_name, 20)

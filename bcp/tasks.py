@@ -36,8 +36,8 @@ def generate_pdf_task(doc_id):
     font_bold = bcp_settings.FONT_PATH_BOLD
     font_name_bold = bcp_settings.FONT_BOLD
     image_path = bcp_settings.IMAGE_PATH
-    image_rede = bcp_settings.IMAGE_REDE
-    image_master = bcp_settings.IMAGE_MASTER
+    image_rede = bcp_settings.IMAGE_PAGBANK
+    image_master = bcp_settings.IMAGE_ELO
     image_cdl = bcp_settings.IMAGE_CDL
 
     doc = DocumentoFiscal.objects.select_related('user__profile').get(id=doc_id)
