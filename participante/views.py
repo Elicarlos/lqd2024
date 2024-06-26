@@ -345,12 +345,13 @@ def user_edit(request, id):
 @login_required
 @transaction.atomic
 def adddocfiscal(request):
-    print('add documento fiscal')
+    print('adddocfiscal')
     if request.method == 'POST':
         documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
         
         if documentoFiscal_form.is_valid():
             cnpj = documentoFiscal_form.cleaned_data['lojista_cnpj']
+            print(cnpj)
             
             try:
                 lojista = Lojista.objects.get(CNPJLojista=cnpj)
@@ -364,8 +365,9 @@ def adddocfiscal(request):
                 return redirect('participante:dashboard')
             
             except Lojista.DoesNotExist:
-                messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024 <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
-    
+                messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024. <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
+        else:
+            messages.error(request, 'Erro no formulário. Verifique os dados fornecidos.')
     else:
         documentoFiscal_form = UserAddFiscalDocForm()
     

@@ -151,13 +151,22 @@ class UserAddFiscalDocForm(forms.ModelForm):
         }
         
 
-    def clean_numeroDocumento(self):
-        numeroDocumento = self.cleaned_data.get('numeroDocumento')
-        lojista_cnpj = self.cleaned_data.get('lojista_cnpj')
-        lojista = Lojista.objects.get(CNPJLojista=lojista_cnpj)
-        if numeroDocumento and DocumentoFiscal.objects.filter(lojista=lojista, numeroDocumento=numeroDocumento).exists():
-            raise forms.ValidationError(u'Este documento fiscal já foi cadastrado para este lojista!')
-        return numeroDocumento
+        def clean(self):
+            cleaned_data = super().clean()
+            numeroDocumento = cleaned_data.get('numeroDocumento')
+            lojista_cnpj = cleaned_data.get('lojista_cnpj')
+            
+            if lojista_cnpj:
+                try:
+                    lojista = Lojista.objects.get(CNPJLojista=lojista_cnpj)
+                except Lojista.DoesNotExist:
+                    self.add_error('lojista_cnpj', "Lojista com o CNPJ fornecido não existe.")
+            
+            if numeroDocumento and lojista_cnpj:
+                if DocumentoFiscal.objects.filter(lojista__CNPJLojista=lojista_cnpj, numeroDocumento=numeroDocumento).exists():
+                    self.add_error('numeroDocumento', 'Este documento fiscal já foi cadastrado para este lojista!')
+            
+            return cleaned_data
 
 class UserAddFiscalDocFormSuperuser(UserAddFiscalDocForm):
     photo = forms.FileField(label='Documento fiscal', required=False)

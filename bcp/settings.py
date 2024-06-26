@@ -15,9 +15,9 @@ FONT_PATH = os.path.join(os.path.split(__file__)[0], 'fonts', 'lucida_sans_regul
 
 IMAGE_PATH = os.path.join(os.path.split(__file__)[0], 'img', 'bannner.png',)
 
-IMAGE_REDE = os.path.join(os.path.split(__file__)[0], 'img', 'rede2.png',)
+IMAGE_REDE = os.path.join(os.path.split(__file__)[0], 'img', 'pagbank.png',)
 # IMAGE_POP = os.path.join(os.path.split(__file__)[0], 'img', 'pop.png',)
-IMAGE_MASTER = os.path.join(os.path.split(__file__)[0], 'img', 'master.png',)
+IMAGE_MASTER = os.path.join(os.path.split(__file__)[0], 'img', 'elo.png',)
 IMAGE_CDL = os.path.join(os.path.split(__file__)[0], 'img', 'cdl.png',)
 IMAGE_MARKO = os.path.join(os.path.split(__file__)[0], 'img', 'solution.png',)
 

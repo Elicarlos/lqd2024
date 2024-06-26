@@ -125,9 +125,9 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     c = canvas.Canvas(buffer)
 
     def draw_fixed_elements():
-        c.drawImage(image_path, 200, 683, mask='auto')
-        c.drawImage(image_rede, 35, 750, mask='auto')
-        c.drawImage(image_master, 400, 730, mask='auto')
+        c.drawImage(image_path, 210, 685, mask='auto')
+        c.drawImage(image_rede, 35, 688, mask='auto')
+        c.drawImage(image_master, 400, 688, mask='auto')
         c.drawImage(image_cdl, 70, 90, mask='auto')
         c.setFont(font_name, 20)
         c.drawString(20, 660, '_______________________________________________________')
