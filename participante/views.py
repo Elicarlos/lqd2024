@@ -133,8 +133,8 @@ def register2(request):
          profile_form = ProfileRegistrationForm()
     return render(request, 'participante/register.html', {'user_form': user_form, 'profile_form': profile_form})
 
-
 @login_required
+@user_passes_test(lambda u: u.is_superuser)
 def definir_posto(request):
     if request.method == "POST":
         action = request.POST.get('action')
