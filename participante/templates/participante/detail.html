@@ -105,9 +105,13 @@
                       <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
                       <span><strong>Imprimir</strong></span> </a>
                   {% else %}
-                  <a href="{% url "bcp:print" doc.id %}" class="btn btn-primary a-btn-slide-text btn-sm">
-                    <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
-                    <span><strong>Imprimir</strong></span> </a>
+                  <form action="{% url 'bcp:print' doc.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary a-btn-slide-text btn-sm">
+                      <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+                      <span><strong>Imprimir</strong></span>
+                    </button>
+                  </form>
                   {% endif %}
 
 
