@@ -25,6 +25,7 @@ from datetime import datetime
 from silk.profiling.profiler import silk_profile
 from celery.result import AsyncResult
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 # from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.templatetags.static import static
@@ -70,6 +71,7 @@ def print_qrcode(request, id_, template='print.html'):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 @transaction.atomic
+@require_POST
 def print_barcode(request, id_, template='print.html'):
     """
     This page causes the browser to request the barcode be printed
