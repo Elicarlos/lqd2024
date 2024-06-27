@@ -11,18 +11,38 @@
     {# TODO: FIXME This is still not working right in non chrome browsers... #}
     {# however probably not needed anymore, as we can force print the PDF using embedded JavaScript #}
     {% comment %}
-    <script type="text/javascript" language="javascript" charset="utf-8" src="{% static 'js/pdfobject.min.js' %}"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="{% static "js/pdfobject.min.js" %}"></script>
     <script type="text/javascript" language="javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    </style>
+    {% endcomment %}
+
+    <style>
+        /* Estilos para a tela de carregamento */
+        #loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.8) url('https://i.gifer.com/ZZ5H.gif') 50% 50% no-repeat;
+            display: none;
+        }
+
+        /* Esconde o iframe inicialmente e depois da impressão */
+        #iFramePdf {
+            display: none;
+            width: 0;
+            height: 0;
+            border: none;
+        }
     </style>
 
     <script type='text/javascript'>
-
-        function embedPDF(elementId){
+        function embedPDF(elementId) {
             var myPDF = new PDFObject({
-
                 url: '{{ pdf_url }}',
                 pdfOpenParams: { view: 'Fit', scrollbars: '0', toolbar: '0', statusbar: '0', messages: '0', navpanes: '0' }
-
             }).embed(elementId);
         }
 
@@ -30,34 +50,86 @@
             var getMyFrame = document.getElementById(elementId);
             getMyFrame.focus();
             getMyFrame.contentWindow.print();
+            setTimeout(() => {
+                getMyFrame.style.display = 'none';  // Ocultar o iframe após a impressão
+                document.getElementById('loading').style.display = 'none';  // Ocultar a tela de carregamento
+            }, 1000);
         }
 
-        $(document).ready(function() {
-            printTrigger('iFramePdf'); // Chrome
-            //embedPDF('pdfobj'); // Non Chrome
+        function checkTaskStatus(task_id) {
+            fetch(`/barcode/check_task_status/${task_id}/`)
+                .then(response => {
+                    if (response.headers.get('content-type').includes('application/json')) {
+                        return response.json();
+                    } else {
+                        // Se não for JSON, presume-se que é o PDF
+                        const iframe = document.getElementById('iFramePdf');
+                        iframe.src = `/barcode/check_task_status/${task_id}/`;
+                        iframe.style.display = 'block';
+                        iframe.onload = function() {
+                            printTrigger('iFramePdf');
+                        };
+                        throw new Error('PDF Loaded');
+                    }
+                })
+                .then(data => {
+                    if (data !== 'PDF Loaded') {
+                        if (data.status === 'SUCCESS') {
+                            const iframe = document.getElementById('iFramePdf');
+                            iframe.src = `/barcode/check_task_status/${task_id}/`;
+                            iframe.style.display = 'block';
+                            iframe.onload = function() {
+                                printTrigger('iFramePdf');
+                            };
+                        } else if (data.status === 'FAILURE') {
+                            alert('Failed to generate PDF');
+                            document.getElementById('loading').style.display = 'none';  // Ocultar a tela de carregamento
+                        } else {
+                            setTimeout(() => checkTaskStatus(task_id), 2000);
+                        }
+                    }
+                })
+                .catch(error => {
+                    if (error.message !== 'PDF Loaded') {
+                        console.error('Error fetching task status:', error);
+                        document.getElementById('loading').style.display = 'none';  // Ocultar a tela de carregamento em caso de erro
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loading').style.display = 'block';  // Mostrar a tela de carregamento
+            const pdf_url = '{{ pdf_url }}';
+            if (pdf_url.includes('task_id=')) {
+                const task_id = pdf_url.split('task_id=').pop();
+                checkTaskStatus(task_id);
+            } else {
+                const iframe = document.getElementById('iFramePdf');
+                iframe.src = pdf_url;
+                iframe.style.display = 'block';
+                iframe.onload = function() {
+                    printTrigger('iFramePdf');
+                };
+            }
         });
-
     </script>
-    {% endcomment %}
-
 </head>
 <body>
+    <div id="loading"></div>  <!-- Tela de carregamento -->
 
-{% comment %}
-<input type="button" value="Print" onclick="printTrigger('iFramePdf');" />
-{% endcomment %}
+    <div id="pdfobj">
+        <iframe id="iFramePdf" style="display:none;"></iframe>
+    </div>
 
-<div id="pdfobj">
-    <iframe id="iFramePdf" src="{{ pdf_url }}" style="display:none;"></iframe>
-</div>
+    <p>{{ doc }}</p>
 
-
-<p>{{ doc }}</p>
-
-<h1 style="margin-top: 70px;">Os cupons referentes ao documento <strong>{{ doc.numeroDocumento }}</strong> estão sendo impressos aguarde!</strong>!</h1>
-<p><a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url 'participante:impressao' %}">
-Imprimir outros cupons
-</a><a type="button" class="btn" href="{% url 'lojista:homepage' %}">Voltar para área de operação</button></p>
+    <h1 style="margin-top: 70px;">Os cupons referentes ao documento <strong>{{ doc.numeroDocumento }}</strong> estão sendo impressos. Por favor, aguarde!</h1>
+    <p>
+        <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:impressao" %}">
+            Imprimir outros cupons
+        </a>
+        <a type="button" class="btn" href="{% url 'participante:backoffice' %}">Voltar para área de operação</a>
+    </p>
 </body>
 </html>
 {% endblock %}

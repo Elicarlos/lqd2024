@@ -15,6 +15,7 @@ from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
 from django.utils.dateformat import DateFormat
 from reportlab.graphics.barcode import qr
+from reportlab.pdfbase import pdfdoc
 from base64 import b64encode
 import logging
 import bcp.settings as bcp_settings
@@ -26,8 +27,11 @@ def somar(x, y):
     
 
 @shared_task
-def generate_pdf_task(doc_id):
-    
+def generate_pdf_task(doc_id, auto_print=True):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer)
+
+    # Configurações
     font_size = bcp_settings.FONT_SIZE
     bar_height = bcp_settings.BAR_HEIGHT
     bar_width = bcp_settings.BAR_WIDTH
@@ -36,24 +40,26 @@ def generate_pdf_task(doc_id):
     font_bold = bcp_settings.FONT_PATH_BOLD
     font_name_bold = bcp_settings.FONT_BOLD
     image_path = bcp_settings.IMAGE_PATH
-    image_rede = bcp_settings.IMAGE_PAGBANK
-    image_master = bcp_settings.IMAGE_ELO
+    image_pagbank = bcp_settings.IMAGE_PAGBANK
+    image_elo = bcp_settings.IMAGE_ELO
     image_cdl = bcp_settings.IMAGE_CDL
 
-    doc = DocumentoFiscal.objects.select_related('user__profile').get(id=doc_id)
-    cupons = Cupom.objects.filter(documentoFiscal=doc).select_related('documentoFiscal', 'documentoFiscal__user')
+    doc = get_object_or_404(DocumentoFiscal.objects.select_related('user__profile'), id=doc_id)
+    cupons = Cupom.objects.filter(documentoFiscal=doc).select_related('documentoFiscal').prefetch_related('documentoFiscal__user')
     profile = doc.user.profile
 
     pdfmetrics.registerFont(TTFont(font_name, font_path))
     pdfmetrics.registerFont(TTFont(font_name_bold, font_bold))
 
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer)
+    # Configurar JS para impressão automática
+    if auto_print:
+        pdfdoc.PDFCatalog.OpenAction = '<</S/JavaScript/JS(this.print({bUI:false,bSilent:true,bShrinkToFit:true}));>>'
+        pdfdoc.PDFInfo.title = 'Liquida Teresina 2024'
 
     def draw_fixed_elements():
-        c.drawImage(image_path, 200, 683, mask='auto')
-        c.drawImage(image_rede, 35, 750, mask='auto')
-        c.drawImage(image_master, 400, 730, mask='auto')
+        c.drawImage(image_path, 210, 685, mask='auto')
+        c.drawImage(image_pagbank, 20, 688, mask='auto')
+        c.drawImage(image_elo, 400, 688, mask='auto')
         c.drawImage(image_cdl, 70, 90, mask='auto')
         c.setFont(font_name, 20)
         c.drawString(20, 660, '_______________________________________________________')
@@ -127,4 +133,4 @@ def generate_pdf_task(doc_id):
     pdf = buffer.getvalue()
     buffer.close()
 
-    return b64encode(pdf).decode('utf-8')
+    return pdf

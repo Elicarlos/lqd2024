@@ -32,10 +32,11 @@ ALLOWED_HOSTS = ['127.0.0.1', 'https://lqd2024-ff3963465f8b.herokuapp.com/', '.l
 
 # Ajuda a abrir cupons na no firefox Importante
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'ALLOW-FROM https://lqd2024-ff3963465f8b.herokuapp.com/'
+# X_FRAME_OPTIONS = 'ALLOW-FROM https://lqd2024-ff3963465f8b.herokuapp.com/'
+X_FRAME_OPTIONS = 'SAMEORIGIN' # Teste
 
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
@@ -188,6 +189,8 @@ USE_L10N = True
 USE_TZ = True
 
 
+
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -254,12 +257,14 @@ ABSOLUTE_URL_OVERRIDES = {
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'America/Sao_Paulo'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+
+USE_CELERY_FOR_PDF = True
 
 
 

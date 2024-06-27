@@ -54,6 +54,7 @@ def print_barcode_embed_example(request, id_, template='cupons_impressos.html'):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def print_qrcode(request, id_, template='print.html'):
+    print("print_qrcode")
     """
     This page causes the browser to request the barcode be printed
     """
@@ -79,15 +80,26 @@ def print_barcode(request, id_, template='print.html'):
     new_doc.status = False
     new_doc.save()
     # doc = get_object_or_404(DocumentoFiscal, id=id_)
-    pdf_url = reverse('bcp:generate', kwargs = {'id_': id_,})
-    context = { 'pdf_url': pdf_url, 'doc':doc }
+    if settings.USE_CELERY_FOR_PDF:
+        task = generate_pdf_task.delay(doc.id, auto_print=True)
+        pdf_url = reverse('bcp:check_task_status', kwargs={'task_id': task.id})
+        pdf_url += '?task_id=' + task.id  # Append the task_id as a query parameter
+    else:
+        pdf_url = reverse('bcp:generate', kwargs={'id_': id_})
+
+    context = {'pdf_url': pdf_url, 'doc': doc}
     return render(request, template, context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def generate(request, id_, barcode_type='Standard39', auto_print=True):
+    return generate_pdf_sync(request, id_, barcode_type='Standard39', auto_print=True)
         
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 @silk_profile(name='Generate PDF')
-def generate(request, id_, barcode_type='Standard39', auto_print=True):
+def generate_pdf_sync(request, id_, barcode_type='Standard39', auto_print=True):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename={id_}.pdf'
 
@@ -102,7 +114,7 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     font_name_bold = bcp_settings.FONT_BOLD
     image_path = bcp_settings.IMAGE_PATH
     image_pagbank = bcp_settings.IMAGE_PAGBANK
-    image_master = bcp_settings.IMAGE_ELO
+    image_elo = bcp_settings.IMAGE_ELO
     image_cdl = bcp_settings.IMAGE_CDL
 
     doc = get_object_or_404(DocumentoFiscal, id=id_)
@@ -127,7 +139,7 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     def draw_fixed_elements():
         c.drawImage(image_path, 210, 685, mask='auto')
         c.drawImage(image_pagbank, 20, 688, mask='auto')
-        c.drawImage(image_master, 400, 688, mask='auto')
+        c.drawImage(image_elo, 400, 688, mask='auto')
         c.drawImage(image_cdl, 70, 90, mask='auto')
         c.setFont(font_name, 20)
         c.drawString(20, 660, '_______________________________________________________')
@@ -204,3 +216,18 @@ def generate(request, id_, barcode_type='Standard39', auto_print=True):
     response.write(pdf)
     return response
 
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def check_task_status(request, task_id):
+    task = AsyncResult(task_id)
+    print("task-id", task)
+    if task.state == 'SUCCESS':
+        # Retorne o PDF diretamente
+        response = HttpResponse(task.result, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="cupom.pdf"'
+        return response
+    elif task.state == 'FAILURE':
+        return JsonResponse({'status': 'FAILURE', 'error': str(task.info)})
+    else:
+        return JsonResponse({'status': task.state})
