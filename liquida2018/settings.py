@@ -257,8 +257,10 @@ ABSOLUTE_URL_OVERRIDES = {
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = config('redis_url')
+CELERY_RESULT_BACKEND = config('redis_url')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
