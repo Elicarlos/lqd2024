@@ -1,14 +1,49 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from decouple import config
 
-# Define o módulo de configuração do Django
+# Define the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'liquida2018.settings')
 
 app = Celery('liquida2018')
 
-# Lê as configurações do Django e namespace 'CELERY'
+# Obtain the Redis URL
+redis_url = config('REDIS_URL', '')
+
+# Append SSL cert requirement if using rediss
+if redis_url.startswith('rediss://'):
+    redis_url += '?ssl_cert_reqs=CERT_NONE'
+
+# Load task modules from all registered Django app configs.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Descobre e carrega tarefas automaticamente dos módulos tasks.py
+app.conf.update(
+    broker_url=redis_url,
+    result_backend=redis_url,
+    redis_max_connections=20,
+    worker_max_tasks_per_child=10,
+    task_soft_time_limit=3600,  # 1 hour
+    task_time_limit=3660,       # 1 hour and 1 minute
+    broker_connection_retry_on_startup=True,
+    broker_transport_options={
+        'visibility_timeout': 43200,  # 12 hours
+        'fanout_prefix': True,
+        'fanout_patterns': True,
+    },
+    worker_concurrency=4,  # Adjust based on available resources
+)
+
+# Configure Celery to use JSON as the serialization format
+app.conf.task_serializer = 'json'
+app.conf.result_serializer = 'json'
+app.conf.accept_content = ['json']
+
+# Configure Celery to use UTC
+app.conf.enable_utc = True
+
+# Configure the timezone for Celery (adjust as necessary)
+app.conf.timezone = 'America/Sao_Paulo'
+
+# Autodiscover tasks in tasks.py
 app.autodiscover_tasks()
