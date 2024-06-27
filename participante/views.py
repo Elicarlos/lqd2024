@@ -477,31 +477,38 @@ def editdocfiscalbyop(request, id):
 @user_passes_test(lambda u: u.is_superuser)
 @transaction.atomic
 def validadocfiscal(request, id):
-    instance = get_object_or_404(DocumentoFiscal, id=id)
+    # Locking the row for update to prevent concurrent modifications
+    instance = get_object_or_404(DocumentoFiscal.objects.select_for_update(), id=id, status=False)  # Adiciona condição para evitar validar já validados
+    
     if request.method == 'POST':
         documentofiscal_form = DocumentoFiscalValidaForm(instance=instance, data=request.POST, files=request.FILES)
         if documentofiscal_form.is_valid():
-            new_doc = documentofiscal_form.save(commit=False)
-            new_doc.qtde = int(new_doc.get_cupons())
-            new_doc.status = not new_doc.pendente
-            new_doc.posto_trabalho = request.user.profile.posto_trabalho
-            new_doc.save()
+            with transaction.atomic():
+                new_doc = documentofiscal_form.save(commit=False)
+                new_doc.qtde = int(new_doc.get_cupons())
+                new_doc.status = not new_doc.pendente
+                new_doc.posto_trabalho = request.user.profile.posto_trabalho
+                new_doc.save()
 
-            if not new_doc.pendente:
-                cupons = [
-                    Cupom(
-                        documentoFiscal=new_doc,
-                        user=new_doc.user,
-                        operador=request.user,
-                        posto_trabalho=request.user.profile.posto_trabalho
-                    ) for _ in range(new_doc.qtde)
-                ]
-                Cupom.objects.bulk_create(cupons)
-                messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
-            else:
-                messages.info(request, f'O documento fiscal {new_doc.numeroDocumento} não foi validado por pendências. Se está tudo certo com o documento, por favor repita novamente o procedimento de validação e desmarque a opção de pendente para que o mesmo seja validado! Se você encontrou pendências no documento em questão, por favor não esqueça de descrevê-las no campo observações!')
+                if not new_doc.pendente:
+                    if Cupom.objects.filter(documentoFiscal=new_doc).exists():
+                        messages.error(request, 'Cupons já foram gerados para este documento fiscal.')
+                        return redirect('participante:user_detail', id=new_doc.user.id)
+                    
+                    cupons = [
+                        Cupom(
+                            documentoFiscal=new_doc,
+                            user=new_doc.user,
+                            operador=request.user,
+                            posto_trabalho=request.user.profile.posto_trabalho
+                        ) for _ in range(new_doc.qtde)
+                    ]
+                    Cupom.objects.bulk_create(cupons)
+                    messages.success(request, 'Documento Fiscal validado com sucesso, agora você pode Imprimir os cupons')
+                else:
+                    messages.info(request, f'O documento fiscal {new_doc.numeroDocumento} não foi validado por pendências. Se está tudo certo com o documento, por favor repita novamente o procedimento de validação e desmarque a opção de pendente para que o mesmo seja validado! Se você encontrou pendências no documento em questão, por favor não esqueça de descrevê-las no campo observações!')
 
-            return redirect('participante:user_detail', id=new_doc.user.id)
+                return redirect('participante:user_detail', id=new_doc.user.id)
 
         messages.error(request, 'Ocorreu um erro durante o processo de validação. Verifique se não há algum dado incoerente no formulário!')
 
