@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
 from decouple import config
-
+import ssl
 # Define the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'liquida2018.settings')
 
@@ -33,6 +33,19 @@ app.conf.update(
     },
     worker_concurrency=4,  # Adjust based on available resources
 )
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config('REDIS_URL'),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {
+                "ssl_cert_reqs": ssl.CERT_NONE  # Use ssl.CERT_REQUIRED se necessário
+            },
+        }
+    }
+}
 
 # Configure Celery to use JSON as the serialization format
 app.conf.task_serializer = 'json'
