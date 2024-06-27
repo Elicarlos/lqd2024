@@ -382,7 +382,7 @@ def adddocfiscal(request):
 def adddocfiscalbyop(request, id):
     user = get_object_or_404(User, id=id)
     is_superuser = request.user.is_superuser
-    
+
     if request.method == 'POST':
         try:
             user_aux = User.objects.get(id=id)
@@ -390,11 +390,11 @@ def adddocfiscalbyop(request, id):
                 documentoFiscal_form = UserAddFiscalDocFormSuperuser(request.POST, files=request.FILES)
             else:
                 documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
-            
+
             cnpj = documentoFiscal_form['lojista_cnpj'].value()
             numerodoc = documentoFiscal_form['numeroDocumento'].value()
             lojista = Lojista.objects.get(CNPJLojista=cnpj)
-            
+
             if user_aux and lojista:
                 if documentoFiscal_form.is_valid():
                     try:
@@ -422,8 +422,9 @@ def adddocfiscalbyop(request, id):
             documentoFiscal_form = UserAddFiscalDocFormSuperuser()
         else:
             documentoFiscal_form = UserAddFiscalDocForm()
-    
+
     return render(request, 'participante/doc_fiscal_add_op.html', {'documentoFiscal_form': documentoFiscal_form, 'participante': user})
+
 
 
 @login_required
@@ -455,21 +456,18 @@ def editdocfiscal(request, id):
     return render(request, 'participante/doc_fiscal_edit.html', {'documentofiscal_form': documentofiscal_form})
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 @transaction.atomic
 def editdocfiscalbyop(request, id):
     if request.method == 'POST':
-        instance = get_object_or_404(DocumentoFiscal, id=id)
-        documentofiscal_form = DocumentoFiscalEditFormOp(instance=instance,
-                                                                        data=request.POST,
-                                                                        files=request.FILES)
+        instance = get_object_or_404(DocumentoFiscal.objects.select_for_update(), id=id)
+        documentofiscal_form = DocumentoFiscalEditFormOp(instance=instance, data=request.POST, files=request.FILES)
         if documentofiscal_form.is_valid():
             documentofiscal_form.save()
             messages.success(request, 'Documento Fiscal atualizado com sucesso!')
         else:
-            messages.error(request, 'Erro na atualização do documento Fiscal! verifique se não há algum dado incoerênte no formulario')
+            messages.error(request, 'Erro na atualização do documento Fiscal! verifique se não há algum dado incoerente no formulário')
     else:
-        instance = get_object_or_404(DocumentoFiscal, id=id)
+        instance = get_object_or_404(DocumentoFiscal.objects.select_for_update(), id=id)
         documentofiscal_form = DocumentoFiscalEditFormOp(instance=instance)
     return render(request, 'participante/doc_fiscal_edit.html', {'documentofiscal_form': documentofiscal_form})
 
