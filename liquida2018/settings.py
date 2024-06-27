@@ -21,7 +21,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Teste
 # ALLOWED_HOSTS = ['127.0.0.1', 'www.liquidateresina.com.br', '.liquidateresina.com.br']
@@ -266,7 +266,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
 
-USE_CELERY_FOR_PDF = False
+USE_CELERY_FOR_PDF = True
 
 
 
