@@ -33,6 +33,8 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from io import BytesIO
+    
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -118,6 +120,20 @@ def generate_pdf_sync(request, id_, barcode_type='Standard39', auto_print=True):
     image_pagbank = bcp_settings.IMAGE_PAGBANK
     image_elo = bcp_settings.IMAGE_ELO
     image_cdl = bcp_settings.IMAGE_CDL
+    
+    def esconde_cpf(cpf):
+        fatia_1 = cpf[:3]
+        fatia_2 = cpf[4:7]
+        fatia_3 = cpf[8:11]
+        fatia_4 = cpf[12:14]
+        return f'***.{fatia_2}.{fatia_3}-**'
+
+    def esconde_telefone(tel):
+        fatia_1 = tel[1:3]
+        fatia_2 = tel[5:10]
+        fatia_3 = tel[11:15]
+
+        return f'({fatia_1}) *****-{fatia_3}'
 
     doc = get_object_or_404(DocumentoFiscal, id=id_)
   
@@ -166,7 +182,7 @@ def generate_pdf_sync(request, id_, barcode_type='Standard39', auto_print=True):
         c.setFont("Helvetica", 20)
         c.drawString(40, 580, "CPF:")
         c.setFont("Helvetica-Bold", 20)
-        c.drawString(95, 580, f'{profile.CPF}')
+        c.drawString(95, 580, f'{esconde_cpf(profile.CPF)}')
         c.setFont("Helvetica", 20)
         c.drawString(40, 520, "Cidade:")
         c.setFont("Helvetica-Bold", 20)
@@ -182,7 +198,7 @@ def generate_pdf_sync(request, id_, barcode_type='Standard39', auto_print=True):
         c.setFont("Helvetica", 20)
         c.drawString(330, 490, "Fone:")
         c.setFont("Helvetica-Bold", 20)
-        c.drawString(390, 490, f'{profile.foneCelular1}')
+        c.drawString(390, 490, f'{esconde_telefone(profile.foneCelular1)}')
         c.setFont("Helvetica", 20)
         c.drawString(40, 460, "Comprou na loja?")
         c.setFont("Helvetica-Bold", 20)
