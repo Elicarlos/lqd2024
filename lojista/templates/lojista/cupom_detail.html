@@ -21,12 +21,12 @@
 {% endif %}
 <h4>Data de Emissão: <strong>{{ cupom.documentoFiscal.dataDocumento }}</strong></h4>
 <h4>Valor: <strong>{{ cupom.documentoFiscal.valorDocumento }}</strong></h4>
-{% comment %} <h4>Cartão Mastercard? {% if cupom.documentoFiscal.compradoMASTERCARD %}
+<h4>Cartão Elo? {% if cupom.documentoFiscal.compradoMASTERCARD %}
                     <span style="color:lightgreen" class="glyphicon glyphicon-ok" aria-hidden="true">
                     {% else %}
                     <span style="color:red" class="glyphicon glyphicon-remove" aria-hidden="true">
-                    {% endif %}</h4> {% endcomment %}
-<h4>Rede? {% if cupom.documentoFiscal.compradoREDE %}
+                    {% endif %}</h4>
+<h4>PagBank? {% if cupom.documentoFiscal.compradoREDE %}
                     <span style="color:lightgreen" class="glyphicon glyphicon-ok" aria-hidden="true">
                     {% else %}
                     <span style="color:red" class="glyphicon glyphicon-remove" aria-hidden="true">
