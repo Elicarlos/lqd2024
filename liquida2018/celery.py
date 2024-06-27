@@ -31,21 +31,12 @@ app.conf.update(
         'fanout_prefix': True,
         'fanout_patterns': True,
     },
-    worker_concurrency=4,  # Adjust based on available resources
+    worker_concurrency=4,
+    redis_backend_use_ssl={"ssl_cert_reqs": ssl.CERT_NONE},  # Adicione esta linha para o backend Redis
+    broker_use_ssl={"ssl_cert_reqs": ssl.CERT_NONE},         # Adicione e# Adjust based on available resources
 )
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config('REDIS_URL'),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {
-                "ssl_cert_reqs": ssl.CERT_NONE  # Use ssl.CERT_REQUIRED se necessário
-            },
-        }
-    }
-}
+
 
 # Configure Celery to use JSON as the serialization format
 app.conf.task_serializer = 'json'
