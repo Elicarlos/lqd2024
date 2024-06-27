@@ -149,7 +149,7 @@ def definir_posto(request):
                 profile = request.user.profile
                 profile.posto_trabalho = posto
                 profile.save(update_fields=['posto_trabalho'])
-                request.session['show_popup'] = ''  # Remover a variável da sessão após salvar
+                request.session['show_popup'] = ''  # Remove the session variable after saving
                 return JsonResponse({'success': 'Posto de trabalho salvo com sucesso!'})
             except Profile.DoesNotExist:
                 return JsonResponse({'error': 'Perfil não encontrado'}, status=404)
