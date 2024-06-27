@@ -27,8 +27,8 @@
             <th style="text-align: center; vertical-align:middle !important">Valor</th>
             <th style="text-align: center; vertical-align:middle !important">Doc fiscal</th>
             <th style="text-align: center; vertical-align:middle !important">Comprov. Cartão</th>
-            {% comment %} <th style="text-align: center; vertical-align:middle !important">Mastercard</th> {% endcomment %}
-            <th style="text-align: center; vertical-align:middle !important">Rede</th>
+            <th style="text-align: center; vertical-align:middle !important">Elo</th>
+            <th style="text-align: center; vertical-align:middle !important">PagBank</th>
             <th style="text-align: center; vertical-align:middle !important">Validação</th>
             <th style="text-align: center; vertical-align:middle !important">Pendencias</th>
             <th style="text-align: center; vertical-align:middle !important">Cupons</th>
@@ -71,13 +71,13 @@
                   {% endif %}
 
             </td>
-                {% comment %} <td style="text-align: center; vertical-align:middle !important">
+                <td style="text-align: center; vertical-align:middle !important">
                   {% if doc.compradoMASTERCARD %}
                     <span style="color:lightgreen" class="glyphicon glyphicon-ok" aria-hidden="true">
                     {% else %}
                     <span style="color:red" class="glyphicon glyphicon-remove" aria-hidden="true">
                     {% endif %}
-                </td> {% endcomment %}
+                </td>
                 <td style="text-align: center; vertical-align:middle !important">  {% if doc.compradoREDE %}
                     <span style="color:lightgreen" class="glyphicon glyphicon-ok" aria-hidden="true">
                     {% else %}

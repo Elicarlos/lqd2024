@@ -126,16 +126,20 @@ class DocumentoFiscal(models.Model):
 
     def get_cupons(self):
         cupons = 0
-        if self.valorDocumento >= 50:
+        if self.valorDocumento >= 50:           
+            multiplo = self.valorDocumento // 50
             if self.compradoMASTERCARD and self.compradoREDE:
-                # Com cartão Elo na maquininha PagBank = 5 Cupons por múltiplo de R$ 50
-                cupons = (self.valorDocumento // 50) * 5
+                # Com cartão Elo na maquininha PagBank = 5 cupons por múltiplo de R$ 50
+                cupons = multiplo * 5
             elif self.compradoREDE:
-                # Pagando na maquininha da PagBank ou com cartão Elo = 3 cupons por múltiplo de R$ 50
-                cupons = (self.valorDocumento // 50) * 3
+                # Pagando na maquininha da PagBank = 3 cupons por múltiplo de R$ 50
+                cupons = multiplo * 3
+            elif self.compradoMASTERCARD:
+                # Pagando com cartão Elo = 5 cupons por múltiplo de R$ 50
+                cupons = multiplo * 3
             else:
                 # Cada R$ 50,00 em compras dá direito a 1 cupom
-                cupons = self.valorDocumento // 50
+                cupons = multiplo
         return cupons
 
     

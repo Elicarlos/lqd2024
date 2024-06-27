@@ -266,13 +266,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
 
-USE_CELERY_FOR_PDF = True
+USE_CELERY_FOR_PDF = False
 
 
-redis_url = config('REDIS_URL', '')
 
-if redis_url.startswith('rediss://'):
-    redis_url += '?ssl_cert_reqs=CERT_NONE'
 
 
 
