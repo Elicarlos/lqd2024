@@ -13,6 +13,8 @@ app_name = 'participante'
 from .views import consulta_cep
 
 urlpatterns = [
+    path('contador/', views.cupons_count_view, name='login'),
+   
     # url(r'^login/$', views.user_login, name='login'),
     path('login/', views.homepage, name='login'),
 

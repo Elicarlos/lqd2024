@@ -37,7 +37,7 @@
 
             <tr>
               {% if doc.pendente %}
-                <td style="text-align: center; vertical-align:middle !important"><a href="{{ doc.get_absolute_url }}">{{ doc.numeroDocumento }}</a></td>
+                <td style="text-align: center; vertical-align:middle !important"><a>{{ doc.numeroDocumento }}</a></td>
               {% else %}
               <td style="text-align: center; vertical-align:middle !important">{{doc.numeroDocumento}}</td>
               {% endif %}

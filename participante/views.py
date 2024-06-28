@@ -210,6 +210,31 @@ def homepage(request):
     # return render(request, 'participante/lojista_interessado.html', context)
         
                 
+from django.db.models import Count
+
+
+# Consulta para obter a quantidade de cupons por documento fiscal
+def get_cupons_count_by_documento():
+    cupons_por_documento = Cupom.objects.values('documentoFiscal__id', 'documentoFiscal__numeroDocumento').annotate(total_cupons=Count('id')).order_by('documentoFiscal')
+    return cupons_por_documento
+
+# Exemplo de uso da função
+cupons_count = get_cupons_count_by_documento()
+for item in cupons_count:
+    print(f"Documento Fiscal ID: {item['documentoFiscal__id']}, Número: {item['documentoFiscal__numeroDocumento']}, Total de Cupons: {item['total_cupons']}")
+    
+from django.shortcuts import render
+from django.db.models import Count
+from participante.models import DocumentoFiscal
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def cupons_count_view(request):
+    cupons_por_documento = Cupom.objects.values('documentoFiscal__id', 'documentoFiscal__numeroDocumento').annotate(total_cupons=Count('id')).order_by('documentoFiscal')
+    context = {
+        'cupons_por_documento': cupons_por_documento
+    }
+    return render(request, 'participante/cupons_count.html', context)
 
    
    
@@ -345,13 +370,13 @@ def user_edit(request, id):
 @login_required
 @transaction.atomic
 def adddocfiscal(request):
-    print('adddocfiscal')
+  
     if request.method == 'POST':
         documentoFiscal_form = UserAddFiscalDocForm(request.POST, files=request.FILES)
         
         if documentoFiscal_form.is_valid():
             cnpj = documentoFiscal_form.cleaned_data['lojista_cnpj']
-            print(cnpj)
+          
             
             try:
                 lojista = Lojista.objects.get(CNPJLojista=cnpj)
@@ -363,6 +388,9 @@ def adddocfiscal(request):
                 
                 messages.success(request, 'Documento adicionado com sucesso!')
                 return redirect('participante:dashboard')
+            
+            except IntegrityError:
+                        messages.error(request, 'Este documento já foi registrado para este lojista pelo usuário.')
             
             except Lojista.DoesNotExist:
                 messages.error(request, "Lojista não cadastrado na base de lojistas do Liquida Teresina 2024. <a href='https://wa.me/5586999950081?text=Ola%20preciso%20de%20suporte' style='color: #FFF'><b>|Informar ao Suporte|</b></a>")
