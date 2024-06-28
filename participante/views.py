@@ -220,8 +220,8 @@ def get_cupons_count_by_documento():
 
 # Exemplo de uso da função
 cupons_count = get_cupons_count_by_documento()
-for item in cupons_count:
-    print(f"Documento Fiscal ID: {item['documentoFiscal__id']}, Número: {item['documentoFiscal__numeroDocumento']}, Total de Cupons: {item['total_cupons']}")
+# for item in cupons_count:
+#     print(f"Documento Fiscal ID: {item['documentoFiscal__id']}, Número: {item['documentoFiscal__numeroDocumento']}, Total de Cupons: {item['total_cupons']}")
     
 from django.shortcuts import render
 from django.db.models import Count
