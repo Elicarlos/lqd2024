@@ -39,7 +39,7 @@ class Profile(models.Model):
     photo = models.ImageField(upload_to='users/%Y/%m/%d', blank=True)
     CHOICES_SEXO = (('M', 'Masculino'), ('F', 'Feminino'), ('P', 'Prefiro não dizer'))
     nome = models.CharField(max_length=100, blank=True)
-    RG = models.CharField(max_length=40, blank=True, unique=True)
+    RG = models.CharField(max_length=40, blank=True, unique=False)
     CPF = models.CharField(max_length=14, blank=True, unique=True)
     #dataAtual = models.DateField(verbose_name=u'Data Atual', null=True, blank=True)  #mudar depois para nao colocar a data atual
     sexo = models.CharField(verbose_name=u'Sexo', max_length=1, choices=CHOICES_SEXO, blank=True, help_text=u'ex. M ou F ou P')

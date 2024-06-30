@@ -61,7 +61,7 @@ class ProfileRegistrationForm(forms.ModelForm):
     estado = forms.ChoiceField(required=True, choices=STATE_CHOICES, widget=forms.Select(attrs={'id' : 'estados'}))
     pergunta = forms.CharField(required=True,widget=forms.TextInput(attrs={'placeholder':'Sua resposta', 'autocomplete':'off'}))
     nome = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Nome Completo*', 'autocomplete':'off', 'class': 'custom-input'}))
-    RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*', 'autocomplete':'off', 'class': 'custom-input' }))
+    # RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*', 'autocomplete':'off', 'class': 'custom-input' }))
     CPF = BRCPFField(required=False, max_length=14, min_length=11, widget=forms.TextInput(attrs={'placeholder':'CPF*',
                                                                                                 'class':'custom-input cpf', 'type':'hidden'}))
     foneCelular1 = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Celular*',
@@ -82,17 +82,11 @@ class ProfileRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('nome', 'CPF', 'RG', 'sexo', 'foneFixo', 'foneCelular1', 'CEP', 'foneCelular2', 'foneCelular3',
+        fields = ('nome', 'CPF',  'sexo', 'foneFixo', 'foneCelular1', 'CEP', 'foneCelular2', 'foneCelular3',
                   'whatsapp','facebook','twitter','endereco','enderecoNumero','enderecoComplemento' ,'bairro','cidade', 'estado',
                    'pergunta' )
-        exclude = ('user', 'dataCadastro', 'cadastradoPor', 'ativo', 'pendente')
+        exclude = ('user', 'dataCadastro', 'cadastradoPor', 'ativo', 'pendente', 'RG')
 
-    def clean_RG(self):
-        RG = self.cleaned_data.get('RG')
-        RG_qs = Profile.objects.filter(RG=RG)
-        if RG_qs.exists():
-            raise ValidationError("O participante com esse RG já está cadastrado!")
-        return RG
 
 
 
@@ -202,7 +196,7 @@ class ProfileEditForm(forms.ModelForm):
     estado = forms.ChoiceField(required=True, choices=STATE_CHOICES, widget=forms.Select(attrs={'id' : 'estados'}))
     pergunta = forms.CharField(required=True,widget=forms.TextInput(attrs={'placeholder':'Sua resposta'}))
     nome = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'Nome Completo*'}))
-    RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*'}))
+    # RG = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder':'RG*'}))
     CPF = BRCPFField(required=True, max_length=14, min_length=11, widget=forms.TextInput(attrs={'placeholder':'CPF*',
                                                                                                 'class':'cpf'}))
     foneCelular1 = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Celular*',
@@ -221,10 +215,10 @@ class ProfileEditForm(forms.ModelForm):
     pergunta = forms.CharField( required=False, widget=forms.TextInput(attrs={'placeholder':'Liquida Teresina'}))
     class Meta:
         model = Profile
-        fields = ('nome', 'RG', 'CPF', 'sexo', 'foneFixo', 'foneCelular1', 'foneCelular2', 'foneCelular3',
+        fields = ('nome',  'CPF', 'sexo', 'foneFixo', 'foneCelular1', 'foneCelular2', 'foneCelular3',
                   'whatsapp','facebook','twitter','endereco','enderecoNumero','enderecoComplemento', 'estado',
                   'cidade','bairro','CEP','pergunta' )
-        exclude = ('user', 'dataCadastro', 'cadastradoPor', 'ativo', 'pendente')
+        exclude = ('user', 'dataCadastro', 'cadastradoPor', 'ativo', 'pendente', 'RG')
 
 
 #FORMULARIO PARA TICKET

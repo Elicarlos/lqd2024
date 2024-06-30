@@ -107,7 +107,7 @@ def register2(request):
                 messages.error(request, 'Não foi possivel prosseguir! Já existe um participante com este CPF ou Email cadastrado!')
                 user_form = UserRegistrationForm()
                 profile_form = ProfileRegistrationForm()
-            return render(request, 'participante/register.html', {'user_form': user_form, 'profile_form': profile_form})
+                return render(request, 'participante/register.html', {'user_form': user_form, 'profile_form': profile_form})
 
         except User.DoesNotExist:
             user_form = UserRegistrationForm(request.POST)
