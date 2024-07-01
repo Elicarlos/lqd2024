@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.urls import reverse
 from yaml import DocumentEndEvent
+
+from participante.tasks import email_boas_vindas_task
 from .forms import *
 from .models import Profile, DocumentoFiscal, PostoTrabalho
 from lojista.models import Lojista, AdesaoLojista
@@ -289,10 +291,10 @@ def register(request):
 
                 new_profile.user = new_user
                 new_profile.save()
-                # subject = "Cadastro concluido com sucesso! Liquida Teresina 2024"
-                # body = "Seu cadastro na promoção Liquida Teresina 2024 foi realizado com sucesso!"
-                # email = EmailMessage(subject, body, to=[new_user.email])
-                # email.send()
+                # Enviar email de boas-vindas de forma assíncrona
+                assunto = "Cadastro concluído com sucesso! Liquida Teresina 2024"
+                corpo = "Seu cadastro na promoção Liquida Teresina 2024 foi realizado com sucesso!"
+                email_boas_vindas_task.delay(assunto, new_user.email, corpo)
                 return render(request,
                               'participante/register_done.html',
                               {'new_user': new_profile})

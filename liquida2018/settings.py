@@ -280,8 +280,8 @@ DEFAULT_FROM_EMAIL = 'suporte@mg.liquidateresina.com.br'
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 ANYMAIL = {
-    'MAILGUN_API_KEY' : '2fe56e35487ac43118a55396cd8ab5d3-5e7fba0f-93b3040e',
-    'MAILGUN_SENDER_DOMAIL' :'mg.liquidateresina.com.br'
+    'MAILGUN_API_KEY' : config('MAILGUN_API_KEY'),
+    'MAILGUN_SENDER_DOMAIL' : config('MAILGUN_SENDER_DOMAIL')
 }
 
 
