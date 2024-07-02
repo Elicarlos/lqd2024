@@ -35,6 +35,10 @@ from django.db import IntegrityError
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
+from django.template.loader import render_to_string
+from .tasks import email_recuperacao_senha
 
 
 
@@ -312,14 +316,8 @@ def register(request):
     return render(request, 'participante/registerpart.html', {'user_form': user_form, 'profile_form': profile_form})
 
 
-# views.py
-# views.py
-# views.py
-# views.py
-from django.contrib.auth.views import PasswordResetView
-from django.urls import reverse_lazy
-from django.template.loader import render_to_string
-from .tasks import email_recuperacao_senha
+
+
 
 class CustomPasswordResetView(PasswordResetView):
     email_template_name = 'registration/password_reset_email.html'
@@ -356,17 +354,7 @@ class CustomPasswordResetView(PasswordResetView):
         subject = ''.join(subject.splitlines())
         body = render_to_string(email_template_name, context)
         email_recuperacao_senha.delay(subject, to_email, body, from_email)
-
-
-
-
-
-
-
-
-
-
-
+        
 
 @login_required
 @transaction.atomic
@@ -634,173 +622,29 @@ from django.db.models import Count, F
 # from django.db.models.functions import ExtractDay, ExtractMonth, ExtractQuarter, ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear
 
 
-
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def dados_campanha(request):
     quant_cupons = Cupom.objects.all().count()
+    
     quant_usuario = Profile.objects.filter(user__is_superuser=False).count()
-    quant_lojistas = Lojista.objects.count()
+    quant_lojistas = Lojista.objects.count()    
     quant_documentos = DocumentoFiscal.objects.count()
+    # lojista = DocumentoFiscal.objects.select_related('lojista', 'user')
 
     labels = []
     data = []
     data_faturamento = []
     valor_faturamento = []
-
+    # da = get_data(cupons)
+    # print("Resultado da Funcao >>>>>>>>>>", data)
+    # cup = Cupom.objects.values('dataCriacao').annotate(total=Count(data))
     bu = Cupom.objects.all().annotate(date=TruncDate('dataCriacao')).values('date').annotate(Count('dataCriacao')).order_by('date')
     faturamento_por_dia = DocumentoFiscal.objects.all().annotate(date=TruncDate('dataCadastro')).values('date').annotate(valor=Sum('valorDocumento')).order_by('date')
+    # q1 = DocumentoFiscal.objects.select_related('user').annotate(total=Sum('valorDocumento'))
 
-    q1 = DocumentoFiscal.objects.all().select_related('user')
-    q2 = q1.values('user__profile__CPF', 'user__profile__nome').annotate(total=Sum('valorDocumento'), virtual=Sum('valorVirtual'))
-    q3 = q2.order_by('-total', '-user__profile__CPF')[:10]
-    cliente_cpf = []
-    total_cpf = []
-
-    for q in q3:
-        cliente_cpf.append(q['user__profile__CPF'])
-        total = float(q['total'])
-        total_cpf.append(total)
-
-    cupons_por_operador = (
-        Cupom.objects
-        .values('operador__first_name')
-        .annotate(cupom_count=Count('id'))
-        .order_by('-cupom_count')
-    )
-
-     # Verificando se o operador tem um nome de usuário válido
-    operadores_info = []
-    for item in cupons_por_operador:
-        operador_username = item.get('operador__username', 'Desconhecido')
-        operadores_info.append({'username': operador_username, 'cupom_count': item['cupom_count']})
-
-
-    for o in operadores_info:
-        print(o)
-
-    grupos = Group.objects.filter(name__in=["Teresina Shopping", "Riverside", "Rio Poty", "Pintos Dirceu"])
-
-    labels_grupo = []
-    data_cupons_por_grupo = []
-
-    for grupo in grupos:
-        operadores_do_grupo = User.objects.filter(groups=grupo)
-        cupons_por_grupo = Cupom.objects.filter(operador__in=operadores_do_grupo).count()
-        labels_grupo.append(grupo.name)
-        data_cupons_por_grupo.append(cupons_por_grupo)
-
-    for fat in faturamento_por_dia:
-        dt = fat['date']
-        dt = datetime.strftime(dt, "%d/%m")
-        data_faturamento.append(dt)
-        fat = float(fat['valor'])
-        valor_faturamento.append(fat)
-
-    for b in bu:
-        dt = b['date']
-        dt = datetime.strftime(dt, "%d/%m")
-        labels.append(dt)
-        data.append(b['dataCriacao__count'])
-
-    quant_doc_ramoAtividade = DocumentoFiscal.objects.all().select_related('lojista')
-    query_ramoAtividade = quant_doc_ramoAtividade.values('lojista__ramoAtividade__atividade').annotate(total=Count('id'))
-    ramo_atividade = []
-    quant_ramo_atividade = []
-
-    for q in query_ramoAtividade:
-        atividade = q['lojista__ramoAtividade__atividade']
-        ramo_atividade.append(atividade)
-        total = q['total']
-        quant_ramo_atividade.append(total)
-
-    # Quantidade de cupons por lojista
-    cupons_por_lojista = (
-        Cupom.objects
-        .values('documentoFiscal__lojista__fantasiaLojista')
-        .annotate(cupom_count=Count('id'))
-        .order_by('-cupom_count')
-    )
-
-    lojistas_info = [
-        {'lojista': item['documentoFiscal__lojista__fantasiaLojista'], 'cupom_count': item['cupom_count']}
-        for item in cupons_por_lojista
-    ]
-
-    # Quantidade de cupons por localização
-    cupons_por_localizacao = (
-        Cupom.objects
-        .values('posto_trabalho__nome')
-        .annotate(cupom_count=Count('id'))
-        .order_by('-cupom_count')
-    )
-
-    localizacoes_info = [
-        {'localizacao': item['posto_trabalho__nome'], 'cupom_count': item['cupom_count']}
-        for item in cupons_por_localizacao
-    ]
-
-    # Quantidade de cupons impressos por localização
-    cupons_impressos_por_localizacao = (
-        Cupom.objects
-        .filter(impresso=True)
-        .values('posto_trabalho__nome')
-        .annotate(cupom_count=Count('id'))
-        .order_by('-cupom_count')
-    )
-
-    impressos_info = [
-        {'localizacao': item['posto_trabalho__nome'], 'cupom_count': item['cupom_count']}
-        for item in cupons_impressos_por_localizacao
-    ]
-
-    operadores = User.objects.filter(is_staff=True).count()
-    faturamento_total = DocumentoFiscal.objects.aggregate(total=Sum('valorDocumento'))
-    faturamento_total = faturamento_total['total']
-    if faturamento_total is None:
-        faturamento_total = 0
-        ticket_medio = 0
-    else:
-        faturamento_total = f"{faturamento_total:.2f}"  # Modificação feita aqui
-        ticket_medio = float(faturamento_total) / quant_documentos
-        ticket_medio = f"{ticket_medio:.2f}"  # Modificação feita aqui
-
-
-    context = {
-        'labels': labels,
-        'data': data,
-        'data_faturamento': data_faturamento,
-        'valor_faturamento': valor_faturamento,
-        'ramo_atividade': ramo_atividade,
-        'quant_ramo_atividade': quant_ramo_atividade,
-        'cliente_cpf': cliente_cpf,
-        'total_cpf': total_cpf,
-        'operadores_info': operadores_info,
-        'labels_grupo': labels_grupo,
-        'data_cupons_por_grupo': data_cupons_por_grupo,
-        'quant_cupons': quant_cupons,
-        'quant_usuario': quant_usuario,
-        'quant_lojistas': quant_lojistas,
-        'quant_documentos': quant_documentos,
-        'operadores': operadores,
-        'faturamento_total': faturamento_total,
-        'ticket_medio': ticket_medio,
-        'lojistas_info': lojistas_info,
-        'localizacoes_info': localizacoes_info,
-        'impressos_info': impressos_info,
-    }
-    return render(request, 'dash/index.html', context)
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def graficos(request):    
-    labels = []
-    data = []
-    data_faturamento = []
-    valor_faturamento = []
-
-    bu = Cupom.objects.all().annotate(date=TruncDate('dataCriacao')).values('date').annotate(Count('dataCriacao')).order_by('date')
-    faturamento_por_dia = DocumentoFiscal.objects.all().annotate(date=TruncDate('dataCadastro')).values('date').annotate(valor=Sum('valorDocumento')).order_by('date')
+    # for q in q1:
+    #     print('Cliente', q.user.profile.nome, 'Total', q.total)
 
     q1 = DocumentoFiscal.objects.all().select_related('user')
     q2 = q1.values('user__profile__CPF', 'user__profile__nome').annotate(total=Sum('valorDocumento'), virtual=Sum('valorVirtual'))
@@ -813,17 +657,145 @@ def graficos(request):
         total = float(q['total'])
         total_cpf.append(f"{total:.2f}")
 
+    
+    
+
     cupons_por_operador = (
-        Cupom.objects
-        .values('operador__username')
-        .annotate(cupom_count=Count('id'))
-        .order_by('-cupom_count')
+    Cupom.objects
+    .values('operador__first_name')
+    .annotate(cupom_count=Count('id'))
+    .order_by('-cupom_count')
     )
 
+    # Query para obter informações sobre os operadores, incluindo o first_name
+    operadores_info = [
+        {'operador': item['operador__first_name'], 'cupom_count': item['cupom_count']}
+        for item in cupons_por_operador
+    ]
+
+    
+    
+
+
+
+    grupos = Group.objects.filter(name__in=["Teresina Shopping", "Riverside","Rio Poty", "Pintos Dirceu"])
+
+    labels_grupo = []
+    data_cupons_por_grupo = []
+
+    for grupo in grupos:
+        operadores_do_grupo = User.objects.filter(groups=grupo)
+        cupons_por_grupo = Cupom.objects.filter(operador__in=operadores_do_grupo).count()
+        labels_grupo.append(grupo.name)
+        data_cupons_por_grupo.append(cupons_por_grupo)
+
+
+       
+        
+    for fat in faturamento_por_dia:
+        dt = fat['date']
+        dt = datetime.strftime(dt,"%d/%m")
+        data_faturamento.append(dt)
+        fat = float(fat['valor'])        
+        valor_faturamento.append(fat)
+
+
+
+    for b in bu:
+        dt = b['date']
+        dt = datetime.strftime(dt,"%d/%m")        
+        labels.append(dt)
+        data.append(b['dataCriacao__count'])
+
+
+    quant_doc_ramoAtividade = DocumentoFiscal.objects.all().select_related('lojista')
+    query_ramoAtividade = quant_doc_ramoAtividade.values('lojista__ramoAtividade__atividade').annotate(total=Count('id'))
+    ramo_atividade = []
+    quant_ramo_atividade = []
+
+   
+    for q in query_ramoAtividade:
+        # atividade = q['lojista__ramo__atividade']
+        atividade = q['lojista__ramoAtividade__atividade']
+        ramo_atividade.append(atividade)
+        total = q['total']
+        quant_ramo_atividade.append(total)     
+
+    
+
+    operadores = User.objects.filter(is_staff=True).count()
+    faturamento_total = DocumentoFiscal.objects.aggregate(total=Sum('valorDocumento'))
+    faturamento_total = faturamento_total['total']
+    if faturamento_total is None:
+        faturamento_total = 0
+        ticket_medio = 0
+    
+    else:
+        ticket_medio = float(faturamento_total / quant_documentos)
+        ticket_medio = f"{ticket_medio:.2f}"
+        faturamento_total = f"{faturamento_total:.2f}"
+
+   
+
+    context = {
+        'labels': labels,
+        'data': data,      
+        'data_faturamento': data_faturamento,
+        'valor_faturamento': valor_faturamento,
+        'ramo_atividade': ramo_atividade,
+        'quant_ramo_atividade':quant_ramo_atividade,
+        'cliente_cpf': cliente_cpf,
+        'total_cpf': total_cpf,
+        'operadores_info': operadores_info,
+        'labels_grupo': labels_grupo,
+        'data_cupons_por_grupo': data_cupons_por_grupo,
+        'quant_cupons': quant_cupons,
+        'quant_usuario': quant_usuario,
+        'quant_lojistas': quant_lojistas,
+        'quant_documentos': quant_documentos,
+        'operadores': operadores,
+        'faturamento_total': faturamento_total,
+        'ticket_medio': ticket_medio,       
+    }
+    return render(request, 'dash/index.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def graficos(request):    
+    labels = []
+    data = []
+    data_faturamento = []
+    valor_faturamento = []
+    # da = get_data(cupons)
+    # print("Resultado da Funcao >>>>>>>>>>", data)
+    # cup = Cupom.objects.values('dataCriacao').annotate(total=Count(data))
+    bu = Cupom.objects.all().annotate(date=TruncDate('dataCriacao')).values('date').annotate(Count('dataCriacao')).order_by('date')
+    faturamento_por_dia = DocumentoFiscal.objects.all().annotate(date=TruncDate('dataCadastro')).values('date').annotate(valor=Sum('valorDocumento')).order_by('date')
+    # q1 = DocumentoFiscal.objects.select_related('user').annotate(total=Sum('valorDocumento'))
+
+    # for q in q1:
+    #     print('Cliente', q.user.profile.nome, 'Total', q.total)
+
+    q1 = DocumentoFiscal.objects.all().select_related('user')
+    q2 = q1.values('user__profile__CPF', 'user__profile__nome').annotate(total=Sum('valorDocumento'), virtual=Sum('valorVirtual'))
+    q3 = q2.order_by('-total', '-user__profile__CPF')[:10]
+    cliente_cpf = []
+    total_cpf = []
+
+    for q in q3:
+        cliente_cpf.append(q['user__profile__CPF'])
+        total = float(q['total'])
+        total_cpf.append(total)
+
+    
+    cupons_por_operador = Cupom.objects.values('operador__username').annotate(cupom_count=Count('id'))
     operadores_info = [
         {'operador': item['operador__username'], 'cupom_count': item['cupom_count']}
         for item in cupons_por_operador
     ]
+
+
 
     grupos = Group.objects.filter(name__in=["Teresina Shopping", "Riverside"])
 
@@ -836,51 +808,88 @@ def graficos(request):
         labels_grupo.append(grupo.name)
         data_cupons_por_grupo.append(cupons_por_grupo)
 
+
+    
+
+
+
+    
+    
+        
     for fat in faturamento_por_dia:
         dt = fat['date']
-        dt = datetime.strftime(dt, "%d/%m")
+        dt = datetime.strftime(dt,"%d/%m")
         data_faturamento.append(dt)
-        fat = float(fat['valor'])
+        fat = float(fat['valor'])        
         valor_faturamento.append(fat)
+
+
 
     for b in bu:
         dt = b['date']
-        dt = datetime.strftime(dt, "%d/%m")
+        dt = datetime.strftime(dt,"%d/%m")        
         labels.append(dt)
         data.append(b['dataCriacao__count'])
+
 
     quant_doc_ramoAtividade = DocumentoFiscal.objects.all().select_related('lojista')
     query_ramoAtividade = quant_doc_ramoAtividade.values('lojista__ramoAtividade__atividade').annotate(total=Count('id'))
     ramo_atividade = []
     quant_ramo_atividade = []
 
+   
     for q in query_ramoAtividade:
+        # atividade = q['lojista__ramo__atividade']
         atividade = q['lojista__ramoAtividade__atividade']
         ramo_atividade.append(atividade)
         total = q['total']
-        quant_ramo_atividade.append(total)
+        quant_ramo_atividade.append(total)     
 
-    context = {
+    
+    
+    
+    
+
+    context = {        
         'labels': labels,
-        'data': data,
+        'data': data,      
         'data_faturamento': data_faturamento,
         'valor_faturamento': valor_faturamento,
         'ramo_atividade': ramo_atividade,
-        'quant_ramo_atividade': quant_ramo_atividade,
+        'quant_ramo_atividade':quant_ramo_atividade,
         'cliente_cpf': cliente_cpf,
         'total_cpf': total_cpf,
         'operadores_info': operadores_info,
         'labels_grupo': labels_grupo,
         'data_cupons_por_grupo': data_cupons_por_grupo,
+    
     }
     return render(request, 'dash/charts.html', context)
 
+
+
+
 def relatorios_camp(request):    
-    return render(request, 'dash/tables.html')
+    return render(request, 'dash/tables.html'  )
+
+
+
+'''from utils.ticket import validarticket
+#FUNCOES PARA GERACAO DE TICKETS
+def gerarticket(request):
+    return render(request, 'ticket/pages/home.html', context={
+        'ticket': validarticket
+    })'''
+
 
 def consulta_cep(request):
     form = CepForm(request.POST or None)
+
+    
+
     return render(request, 'participante/form.html', {'form': form})
 
+
 def resumo_lojistas(request):
+    # documento = Momde
     return render(request, 'dash/tables.html')
