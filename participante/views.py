@@ -671,11 +671,13 @@ def dados_campanha(request):
     operadores_info = []
     for item in cupons_por_operador:
         operador_username = item.get('operador__username', 'Desconhecido')
-        operadores_info.append({'username': operador_username, 'cupom_count': item['cupom_count']})
+        try:
+            operador_user = User.objects.get(username=operador_username)
+            operador_first_name = operador_user.first_name if operador_user.first_name else operador_username
+        except User.DoesNotExist:
+            operador_first_name = 'Desconhecido'
+        operadores_info.append({'username': operador_first_name, 'cupom_count': item['cupom_count']})
 
-    # Debug: imprimindo o resultado para verificar
-    for o in operadores_info:
-        print(o)
 
     
     

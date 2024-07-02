@@ -952,7 +952,7 @@ var myLineChart = new Chart(ctx, {
     data: {
       labels: [
       {% for operador_info in operadores_info %}
-        "{{ operador_info.username }}",
+        "{{ operador_info.username}}",
       {% endfor %}
     ],
       datasets: [{
