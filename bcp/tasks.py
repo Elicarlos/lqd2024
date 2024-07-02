@@ -82,7 +82,7 @@ def generate_pdf_task(doc_id, auto_print=True):
 
     for cupom in cupons:
         vendedor = cupom.documentoFiscal.vendedor
-        vendedor_str = vendedor if vendedor is not None else ""
+        vendedor_str = vendedor if vendedor is not None else "N/A"
         
         draw_fixed_elements()
         cupom.dataImpressao = datetime.now()
