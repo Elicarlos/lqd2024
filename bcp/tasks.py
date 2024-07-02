@@ -81,6 +81,9 @@ def generate_pdf_task(doc_id, auto_print=True):
         c.drawString(150, 630, "Dados do Participante")
 
     for cupom in cupons:
+        vendedor = cupom.documentoFiscal.vendedor
+        vendedor_str = vendedor if vendedor is not None else ""
+        
         draw_fixed_elements()
         cupom.dataImpressao = datetime.now()
         code = cupom.get_info()
@@ -122,7 +125,7 @@ def generate_pdf_task(doc_id, auto_print=True):
         c.setFont("Helvetica", 20)
         c.drawString(330, 460, "Vendedor:")
         c.setFont("Helvetica-Bold", 20)
-        c.drawString(330, 430, f'{cupom.documentoFiscal.vendedor}')
+        c.drawString(330, 430, f'{vendedor_str}')
         c.setFont("Helvetica", 20)
         c.drawString(100, 390, "Qual a maior campanha de premios do Piauí?")
         c.setFont("Helvetica-Bold", 20)
