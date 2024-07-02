@@ -346,26 +346,17 @@ class CustomPasswordResetView(PasswordResetView):
         # Salva o formulário e gera o e-mail
         form.save(**opts)
         
-        # Obtém o email do usuário do formulário
-        user_email = form.cleaned_data["email"]
-        
-        # Envia o e-mail de redefinição de senha usando Celery
-        for user in form.get_users(user_email):
-            context = {
-                'email': user_email,
-                'domain': self.request.META['HTTP_HOST'],
-                'site_name': 'Liquidateresina',
-                'uid': self.token_generator.make_token(user),
-                'user': user,
-                'token': self.token_generator.make_token(user),
-                'protocol': 'https' if self.request.is_secure() else 'http',
-            }
-            subject = render_to_string(self.subject_template_name, context)
-            subject = ''.join(subject.splitlines())
-            body = render_to_string(self.email_template_name, context)
-            email_recuperacao_senha.delay(subject, body, self.from_email, [user_email])
-        
         return super().form_valid(form)
+
+    def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
+        """
+        Envia um e-mail de redefinição de senha usando Celery.
+        """
+        subject = render_to_string(subject_template_name, context)
+        subject = ''.join(subject.splitlines())
+        body = render_to_string(email_template_name, context)
+        email_recuperacao_senha.delay(subject, to_email, body, from_email)
+
 
 
 
