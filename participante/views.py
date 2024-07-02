@@ -662,16 +662,20 @@ def dados_campanha(request):
 
     cupons_por_operador = (
     Cupom.objects
-    .values('operador__first_name')
+    .values('operador__username')
     .annotate(cupom_count=Count('id'))
     .order_by('-cupom_count')
     )
 
-    # Query para obter informações sobre os operadores, incluindo o first_name
-    operadores_info = [
-        {'operador': item['operador__first_name'], 'cupom_count': item['cupom_count']}
-        for item in cupons_por_operador
-    ]
+    # Verificando se o operador tem um nome de usuário válido
+    operadores_info = []
+    for item in cupons_por_operador:
+        operador_username = item.get('operador__username', 'Desconhecido')
+        operadores_info.append({'username': operador_username, 'cupom_count': item['cupom_count']})
+
+    # Debug: imprimindo o resultado para verificar
+    for o in operadores_info:
+        print(o)
 
     
     
