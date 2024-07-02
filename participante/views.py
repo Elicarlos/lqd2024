@@ -100,6 +100,7 @@ def participante_list(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser)
 @transaction.atomic
 def register2(request):
     if request.method == 'POST':
@@ -126,6 +127,11 @@ def register2(request):
                 new_profile = profile_form.save(commit=False)
                 new_profile.user = new_user
                 new_profile.save()
+                
+                assunto = "Cadastro concluído com sucesso! Liquida Teresina 2024"
+                corpo = "Seu cadastro na promoção Liquida Teresina 2024 foi realizado com sucesso!"
+                email_boas_vindas_task.delay(assunto, new_user.email, corpo)
+                
                 messages.success(request, 'Participante cadastrado com sucesso!')
                 return render(request,
                               'participante/register_done2.html',
@@ -304,6 +310,71 @@ def register(request):
         user_form = UserRegistrationForm()
         profile_form = ProfileRegistrationForm()
     return render(request, 'participante/registerpart.html', {'user_form': user_form, 'profile_form': profile_form})
+
+
+# views.py
+# views.py
+# views.py
+# views.py
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
+from django.template.loader import render_to_string
+from .tasks import email_recuperacao_senha
+
+class CustomPasswordResetView(PasswordResetView):
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = reverse_lazy('participante:password_reset_done')
+    template_name = 'registration/password_reset_form.html'
+    from_email = 'suporte@mg.liquidateresina.com.br'
+
+    def form_valid(self, form):
+        """
+        Substitui o método form_valid para enviar o email de redefinição de senha usando Celery.
+        """
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+            'extra_email_context': self.extra_email_context,
+        }
+        
+        # Salva o formulário e gera o e-mail
+        form.save(**opts)
+        
+        # Obtém o email do usuário do formulário
+        user_email = form.cleaned_data["email"]
+        
+        # Envia o e-mail de redefinição de senha usando Celery
+        for user in form.get_users(user_email):
+            context = {
+                'email': user_email,
+                'domain': self.request.META['HTTP_HOST'],
+                'site_name': 'Liquidateresina',
+                'uid': self.token_generator.make_token(user),
+                'user': user,
+                'token': self.token_generator.make_token(user),
+                'protocol': 'https' if self.request.is_secure() else 'http',
+            }
+            subject = render_to_string(self.subject_template_name, context)
+            subject = ''.join(subject.splitlines())
+            body = render_to_string(self.email_template_name, context)
+            email_recuperacao_senha.delay(subject, body, self.from_email, [user_email])
+        
+        return super().form_valid(form)
+
+
+
+
+
+
+
+
+
 
 
 @login_required

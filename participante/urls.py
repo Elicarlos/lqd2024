@@ -75,22 +75,24 @@ urlpatterns = [
     re_path(r'^password-change/$', PasswordChangeView.as_view(
         template_name= 'registration/password_change_form.html',
         success_url = 'done/'),name='password_change'),
-    re_path(r'^password-change/done/', PasswordChangeDoneView.as_view(
+    re_path(r'^password-change/done/$', PasswordChangeDoneView.as_view(
         template_name='registration/password_change_done.html', extra_context=None
         ),name='password_change_done'),
 
 
     # restore password paths
-    re_path(r'^password-reset/$',PasswordResetView.as_view(
-        template_name='registration/password_reset_form.html',
-        email_template_name='registration/password_reset_email.html',
-        success_url = reverse_lazy('participante:password_reset_done')),name='password_reset'),
-    re_path(r'^password-reset/done/', PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html', extra_context=None
+    # REMOVIDO
+    # re_path(r'^password-reset/$',PasswordResetView.as_view(
+    #     template_name='registration/password_reset_form.html',
+    #     email_template_name='registration/password_reset_email.html',
+    #     success_url = reverse_lazy('participante:password_reset_done')),name='password_reset'),
+    path('password-reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
+    re_path(r'^password-reset/done/$', PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html', extra_context=None
        ), name='password_reset_done'),
 
-    re_path(r'^password-reset/confirm/(?P<uidb64>[-\w]+)/(?P<token>[-\w]+)/$', PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'
-        , success_url=reverse_lazy('participante:password_reset_complete')), name='password_reset_confirm'),
-    re_path(r'^password-reset/complete/', PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html',  extra_context=None
+    re_path(r'^password-reset/confirm/(?P<uidb64>[-\w]+)/(?P<token>[-\w]+)/$', PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html', success_url=reverse_lazy('participante:password_reset_complete')), name='password_reset_confirm'),
+
+    re_path(r'^password-reset/complete/$', PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html',  extra_context=None
         ), name='password_reset_complete'),
 
 

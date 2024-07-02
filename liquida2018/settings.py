@@ -251,11 +251,11 @@ ABSOLUTE_URL_OVERRIDES = {
 # SERVER_EMAIL = "liquida2022.com.br"  # ditto (default from-email for Django errors)
 
 # EMAIL_SUBJECT_PREFIX = 'Liquida 2022'
-# EMAIL_HOST = 'smtp.mailgun.org'
-# EMAIL_HOST_USER = 'suporte@liquida2022.com.br'
-# EMAIL_HOST_PASSWORD = '6f9efe4b6c271d81d3931b44ac2fa12a-9776af14-befba8d1'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = config('MAILGUN_SENDER_DOMAIL')
+EMAIL_HOST_PASSWORD =  config('MAILGUN_API_KEY')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # CELERY_BROKER_URL = 'redis://localhost:6379/0'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

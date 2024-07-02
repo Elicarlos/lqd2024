@@ -3,9 +3,9 @@
 {% load widget_tweaks %}
 {% block title %}Lojistas{% endblock %}
 {% block content %}
-  <form method="get">
-    <div class="well" style="margin-top: 70px;">
-      <h4 style="margin-top: 0">Filtro</h4>
+  <!-- <form method="get"> -->
+    <div style="margin-top: 15rem;">
+      <!-- <h4 style="margin-top: 0">Filtro</h4>
       <div class="row">
         <div class="form-group col-sm-4 col-md-3">
           {{ filter.form.CNPJLojista.label_tag }}
@@ -14,9 +14,9 @@
         <button type="submit" class="btn btn-primary">
           <span class="glyphicon glyphicon-search"></span> Buscar
         </button>
-      </div>
+      </div> -->
     </div>
-  </form>
+  <!-- </form> -->
 <div class="table-responsive">
   <table class="table table-hover">
     <thead>
@@ -41,7 +41,7 @@
             {% if interessado.atendido %}
               Sim
             {% else %}
-              <a href="{% url 'lojista:marcar_como_atendido' interessado.id %}" class="btn btn-success btn-sm"><i class="fas fa-check"></i></a>
+              <a href="{% url 'lojista:marcar_como_atendido' interessado.id %}" class="btn btn-success btn-sm">Marcar como Atendido</a>
             {% endif %}
           </td>
         </tr>
