@@ -366,10 +366,10 @@ def edit(request):
                                        data=request.POST,
                                        files=request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+            user_form.save(commit=False)
             profile_form.save()
             messages.success(request, 'Perfil atualizado com sucesso')
-            return render(request, 'participante/dashboard.html')
+            return redirect('participante:dashboard')
         else:
             messages.error(request, 'Erro na atualização do perfil')
     else:

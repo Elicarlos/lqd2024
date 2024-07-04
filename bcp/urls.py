@@ -20,6 +20,7 @@ urlpatterns = [
     re_path(r'^(?P<id_>[-\w]+)/print_qrcode$', views.print_qrcode, name='print_qrcode'),
     re_path(r'^(?P<id_>[-\w]+)/test', views.print_barcode_embed_example, name='embed-example'),
     path('check_task_status/<str:task_id>/', views.check_task_status, name="check_task_status"),
+    # path('success/<str:task_id>/', views.success_page, name='success')
     
     
     # path('regulamento/', views.regulamento, name='regulamento'),

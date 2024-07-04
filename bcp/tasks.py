@@ -20,10 +20,6 @@ from base64 import b64encode
 import logging
 import bcp.settings as bcp_settings
 
-
-@shared_task
-def somar(x, y):
-    return x + y
     
 
 @shared_task

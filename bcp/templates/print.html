@@ -10,11 +10,6 @@
     <title>Print PDF</title>
     {# TODO: FIXME This is still not working right in non chrome browsers... #}
     {# however probably not needed anymore, as we can force print the PDF using embedded JavaScript #}
-    {% comment %}
-    <script type="text/javascript" language="javascript" charset="utf-8" src="{% static "js/pdfobject.min.js" %}"></script>
-    <script type="text/javascript" language="javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    </style>
-    {% endcomment %}
 
     <style>
         /* Estilos para a tela de carregamento */
@@ -39,6 +34,8 @@
     </style>
 
     <script type='text/javascript'>
+        let isPrintTriggered = false;
+
         function embedPDF(elementId) {
             var myPDF = new PDFObject({
                 url: '{{ pdf_url }}',
@@ -47,12 +44,20 @@
         }
 
         function printTrigger(elementId) {
+            if (isPrintTriggered) {
+                return;
+            }
+            isPrintTriggered = true;
             var getMyFrame = document.getElementById(elementId);
             getMyFrame.focus();
             getMyFrame.contentWindow.print();
+            
             setTimeout(() => {
                 getMyFrame.style.display = 'none';  // Ocultar o iframe após a impressão
                 document.getElementById('loading').style.display = 'none';  // Ocultar a tela de carregamento
+                const pdf_url = '{{ pdf_url }}';
+                const printStatusKey = `printStatus-${pdf_url}`;
+                sessionStorage.setItem(printStatusKey, 'printed');
             }, 1000);
         }
 
@@ -100,6 +105,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('loading').style.display = 'block';  // Mostrar a tela de carregamento
             const pdf_url = '{{ pdf_url }}';
+            const printStatusKey = `printStatus-${pdf_url}`;
+
+            if (sessionStorage.getItem(printStatusKey) === 'printed') {
+                document.getElementById('loading').style.display = 'none';  // Ocultar a tela de carregamento se já foi impresso
+                return;
+            }
+
             if (pdf_url.includes('task_id=')) {
                 const task_id = pdf_url.split('task_id=').pop();
                 checkTaskStatus(task_id);
@@ -125,7 +137,7 @@
 
     <h1 style="margin-top: 70px;">Os cupons referentes ao documento <strong>{{ doc.numeroDocumento }}</strong> estão sendo impressos. Por favor, aguarde!</h1>
     <p>
-        <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:impressao" %}">
+        <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:user_detail" doc.user.id %}">
             Imprimir outros cupons
         </a>
         <a type="button" class="btn" href="{% url 'participante:backoffice' %}">Voltar para área de operação</a>

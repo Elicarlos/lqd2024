@@ -125,7 +125,7 @@
 
     <h1 style="margin-top: 70px;">Os cupons referentes ao documento <strong>{{ doc.numeroDocumento }}</strong> estão sendo impressos. Por favor, aguarde!</h1>
     <p>
-        <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:impressao" %}">
+        <a type="button" id="mymodal" class="btn btn-primary btn-lg" data-toggle="modal" href="{% url "participante:user_detail" doc.user.id %}">
             Imprimir outros cupons
         </a>
         <a type="button" class="btn" href="{% url 'participante:backoffice' %}">Voltar para área de operação</a>

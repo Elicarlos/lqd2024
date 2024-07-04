@@ -115,6 +115,12 @@ class UserEditForm(forms.ModelForm):
             'date_joined': forms.HiddenInput,
         }
         exclude = ('password','username',)
+        
+    def __init__(self, *args, **kwargs):
+        super(UserEditForm, self).__init__(*args, **kwargs)
+        # Se você deseja garantir que `is_active` nunca seja alterado, não o inclua no formulário
+        if 'is_active' in self.fields:
+            del self.fields['is_active']
 
 
 class UserAddCoupom(forms.ModelForm):
