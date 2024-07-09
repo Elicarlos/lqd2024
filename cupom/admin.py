@@ -13,8 +13,7 @@ class CupomResource(resources.ModelResource):
 class CupomAdmin(ImportExportActionModelAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ( 'id','user', 'documentoFiscal', 'operador', 'dataCriacao', 'impresso', 'dataImpressao')
     search_fields = ( 'documentoFiscal__numeroDocumento','id', 'user__username', 'operador__username')
-    # readonly_fields =('operador', 'posto_trabalho')
-    readonly_fields =('posto_trabalho',)
+    readonly_fields =('operador', 'posto_trabalho')
     resource_class = CupomResource
 
 admin.site.register(Cupom, CupomAdmin)
