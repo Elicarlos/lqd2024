@@ -51,7 +51,7 @@ class DocumentoFiscalAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     
     readonly_fields = ('posto_trabalho', 'enviado_por_operador')
 
-    search_fields = ('numeroDocumento', 'user__username',)
+    search_fields = ('numeroDocumento', 'user__username','cadastradoPor__username')
     resource_class = DocumentoFiscalResource
 
 
