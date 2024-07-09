@@ -9,7 +9,6 @@ class CupomResource(resources.ModelResource):
 	class Meta:
 		model = Cupom
 
-
 class CupomAdmin(ImportExportActionModelAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ( 'id','user', 'documentoFiscal', 'operador', 'dataCriacao', 'impresso', 'dataImpressao')
     search_fields = ( 'documentoFiscal__numeroDocumento','id', 'user__username', 'operador__username')
